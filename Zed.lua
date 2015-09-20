@@ -1,20 +1,21 @@
 --A basic BoL template for the Eclipse Lua Development Kit module's execution environment written by Nader Sl.
 -- Download script
-local version = 0.01
-local author = "Totally Legit"
-local SCRIPT_NAME = "Totally Swain"
+-- Download script
+local version = 0.02
+local author = "Ensuluyn"
+local SCRIPT_NAME = "LonseViktor"
 local AUTOUPDATE = true
 local UPDATE_HOST = "raw.github.com"
-local UPDATE_PATH = "/Lonsemaria/scripts/blob/master/Zed.lua".."?rand="..math.random(1,10000)
+local UPDATE_PATH = "/Lonsemaria/scripts/master/Zed.lua".."?rand="..math.random(1,10000)
 local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
 local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
 
 function Say(text)
-  print("<font color=\"#FF0000\"><b>Totally Swain:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
+  print("<font color=\"#FF0000\"><b>Efe EKMEN:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
 end
 
 if AUTOUPDATE then
-  local ServerData = GetWebResult(UPDATE_HOST, "/Lonsemaria/version/blob/master/Viktor.version")
+  local ServerData = GetWebResult(UPDATE_HOST, "/Lonsemaria/version/master/Viktor.version")
   if ServerData then
     ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
     if ServerVersion then
