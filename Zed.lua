@@ -1,42 +1,44 @@
 --A basic BoL template for the Eclipse Lua Development Kit module's execution environment written by Nader Sl.
-local version = "0.01"
-local author = "Ensuluyn"
-local TextList = {"Do Not Chase", "You Can Chase", "Ally Can Chase"}
-local ChaseText = {}
+-- Download script
+local version = 0.01
+local author = "Totally Legit"
+local SCRIPT_NAME = "Totally Swain"
 local AUTOUPDATE = true
 local UPDATE_HOST = "raw.github.com"
-local UPDATE_PATH = "/Lonsemaria/deneme/blob/master/Zed.lua".."?rand="..math.random(1,10000)
+local UPDATE_PATH = "/Lonsemaria/scripts/blob/master/Zed.lua".."?rand="..math.random(1,10000)
 local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
 local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
 
-function _AutoupdaterMsg(msg) print("<font color=\"#FFA500\"><b>Kayle:</b></font> <font color=\"#FFD700\">"..msg..".</font>") end
+function Say(text)
+  print("<font color=\"#FF0000\"><b>Totally Swain:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
+end
+
 if AUTOUPDATE then
-  local ServerData = GetWebResult(UPDATE_HOST, "/TitosOceanus/Bot-of-Legends/master/version/Kayle.version")
+  local ServerData = GetWebResult(UPDATE_HOST, "/Lonsemaria/version/blob/master/Viktor.version")
   if ServerData then
     ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
     if ServerVersion then
       if tonumber(version) < ServerVersion then
-        _AutoupdaterMsg("New version available "..ServerVersion)
-        _AutoupdaterMsg("Updating, please don't press F9")
-        DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () _AutoupdaterMsg("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end) end, 3)
+        Say("New version available "..ServerVersion)
+        Say("Updating, please don't press F9")
+        DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () Say("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end) end, 3)
       else
-        _AutoupdaterMsg("You have got the latest version ("..ServerVersion..")")
+        Say("You have got the latest version (v"..ServerVersion..") of Totally Swain by " .. author)
       end
     end
   else
-    _AutoupdaterMsg("Error downloading version info")
+    Say("Error downloading version info")
   end
 end
-
---Script Name:LonseViktor
---Script Version:0.01
---Script Author:Ensuluyn
---I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
 player = GetMyHero()
 if myHero.charName ~= "Viktor" then return
 end
 local ts,tsq,tsw,tse,tsr
 function OnLoad()
+if autoupdate then
+    update()
+  end
+
  if not RequireSimpleLib() then return end
    Drawdmglib()
    Targetselection()
@@ -45,51 +47,7 @@ function OnLoad()
    print("<font color=\"#00BAE4\"><b> LonseViktor - </b></font><font color=\"#CBF6FF\"> LonseViktor V.01 is loaded.Enjoy your time :)")
    print("<font color=\"#00BAE4\"><b> LonseViktor - </b></font><font color=\"#CBF6FF\"> I'm really new on scripting thats why feel free to give me some feedbacks on forum :)")
 end
-function Update()
-  if not autoupdate then 
-    p("Autoupdate's disabled")
-  return 
-  end
-    p("Updating S1mple_Ziggs")
-    local ServerData = GetWebResult(Update_HOST, "/Scarjit/Scripts/master/S1mple_Ziggs.version")
-    if ServerData then
-      ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
-      if ServerVersion then
-        if tonumber(version) < ServerVersion then
-          p("Update found")
-          p("Local Version: "..version" <==> ServerVersion: "..ServerVersion)
-          p("Updating, don't press F9")
-          DelayAction(function() DownloadFile(Update_URL, Update_FILE_PATH, function () p("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end) end, 3)
-        else
-          p("No Update found")
-        end
-      end
-    else
-      p("Autoupdate failed")
-    end
-end
 
-function ChkUpdate()
-  if not chkupdates then return end
-  if autoupdate then return end
-  p("Checking for Updates")
-      local ServerData = GetWebResult(Update_HOST, "/Scarjit/Scripts/master/S1mple_Ziggs.version")
-    if ServerData then
-      ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
-      if ServerVersion then
-        if tonumber(version) < ServerVersion then
-          p("Update found")
-          p("Local Version: "..version" <==> ServerVersion: "..ServerVersion)
-          p("Please update manually or turn autoupdate on")
-        else
-          p("No Update found")
-        end
-      end
-    else
-      p("Update Check failed")
-    end
-  
-end 
 function findorbwalker()
  if _G.Reborn_Loaded then
     SAC=true and
