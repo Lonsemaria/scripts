@@ -1,8 +1,8 @@
 --Script Name:LonseViktor
---Script Version:0.02
+--Script Version:0.01
 --Script Author:Ensuluyn
 --I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
-local version = 0.01
+local version = 0.02
 local author = "Ensuluyn"
 local SCRIPT_NAME = "LonseViktor"
 local AUTOUPDATE = true
