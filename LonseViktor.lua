@@ -2,7 +2,7 @@
 --Script Version:0.01
 --Script Author:Ensuluyn
 --I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
-local version = 0.02
+local version = 0.01
 local author = "Ensuluyn"
 local SCRIPT_NAME = "LonseViktor"
 local AUTOUPDATE = true
@@ -42,13 +42,12 @@ function OnLoad()
    Targetselection()
    Menu()
    findorbwalker()
-   print("<font color=\"#00BAE4\"><b> LonseViktor - </b></font><font color=\"#CBF6FF\"> LonseViktor V 1.0 is loaded.Enjoy your time :)")
-   print("<font color=\"#00BAE4\"><b> LonseViktor - </b></font><font color=\"#CBF6FF\"> I'm really new on scripting thats why feel free to give me some feedbacks on forum :)")
+   print("<font color=\"#FF0000\"><b> LonseViktor - </b></font><font color=\"#CBF6FF\"> I'm really new on scripting thats why feel free to give me some feedbacks on forum :)")
 end
 function findorbwalker()
  if _G.Reborn_Loaded then
     SAC=true and
-    print("<font color=\"#00BAE4\"><b> LonseViktor - </b></font><font color=\"#CBF6FF\">SACR has been found")
+    print("<font color=\"#FF0000\"><b> LonseViktor - </b></font><font color=\"#CBF6FF\">SACR has been found")
   elseif not _G.Reborn_Loaded and FileExist(LIB_PATH .. "SxOrbWalk.lua") then
     SxOrb=true
     require("SxOrbWalk")
