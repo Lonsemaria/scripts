@@ -2,6 +2,7 @@
 --Script Version:0.01
 --Script Author:Ensuluyn
 --I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
+--Changelog: V.01 has been realised
 local version = 0.01
 local author = "Ensuluyn"
 local SCRIPT_NAME = "LonseViktor"
@@ -38,6 +39,7 @@ end
 local ts,tsq,tsw,tse,tsr
 function OnLoad()
  if not RequireSimpleLib() then return end
+   itemfix()
    Drawdmglib()
    Targetselection()
    Menu()
@@ -80,11 +82,16 @@ function Targetselection()
    ESpell = _Spell({Slot = _E, DamageName = "E", Range = math.huge, Width = 90, Delay = 0, Speed = math.huge, Collision = true, Aoe = false, Type = SPELL_TYPE.LINEAR})
    RSpell = _Spell({Slot = _R, DamageName = "R", Range =700, Width = 0, Delay = 0.25, Speed = 1000, Collision = false, Aoe = true, Type = SPELL_TYPE.CIRCULAR})
    Ignite = _Spell({Slot = FindSummonerSlot("summonerdot"), DamageName = "IGNITE", Range = 600, Type = SPELL_TYPE.TARGETTED})
-end
-
+--|> Minion Managers
+    enemyMinions   = minionManager(MINION_ENEMY,   650, myHero, MINION_SORT_MAXHEALTH_DEC)
+    allyMinions    = minionManager(MINION_ALLY,   650, myHero, MINION_SORT_MAXHEALTH_DEC)
+    jungleMinions  = minionManager(MINION_JUNGLE,  650, myHero, MINION_SORT_MAXHEALTH_DEC)
+    otherMinions   = minionManager(MINION_OTHER,   650, myHero, MINION_SORT_MAXHEALTH_DEC)
+    end
 -- handles script logic, a pure high speed loop
 function OnTick()
- if(   Config.combo.combokey )then
+     autozhonya()
+ if(Config.combo.combokey )then
     combo()
   end
   if(Config.laneclear.laneclearkey)then
@@ -114,8 +121,8 @@ function Menu()
       Config.harass:addParam("useQ", "Harass With Q", SCRIPT_PARAM_ONOFF, true)
       Config.harass:addParam("useE", "Harass With E", SCRIPT_PARAM_ONOFF, true)
       
-      Config:addSubMenu("Laneclear Settings","laneclear")
-      Config.laneclear:addParam("laneclearkey", "Laneclear Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("V"))
+      Config:addSubMenu("Lane&Jungleclear Settings","laneclear")
+      Config.laneclear:addParam("laneclearkey", "Lane Clear Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("V"))
       Config.laneclear:addParam("useQ","Use Q on Laneclear",SCRIPT_PARAM_ONOFF,true)
       Config.laneclear:addParam("useE","Use E on Laneclear",SCRIPT_PARAM_ONOFF,true)
       
@@ -125,6 +132,11 @@ function Menu()
       Config.killsteal:addParam("useE", "Steal With E", SCRIPT_PARAM_ONOFF, true)
       Config.killsteal:addParam("useR", "Steal With R", SCRIPT_PARAM_ONOFF, true)
       Config.killsteal:addParam("useI", "Steal With Ignite", SCRIPT_PARAM_ONOFF, true)
+      
+      Config:addSubMenu("Item Settings", "item")
+      Config.item:addParam("enableautozhonya", "Auto Zhonya", SCRIPT_PARAM_ONOFF, false)
+      Config.item:addParam("autozhonya", "Zhonya if Health under -> %", SCRIPT_PARAM_SLICE, 10, 0, 100, 0)
+     
       Config:addSubMenu("Other Settings","other")
       Config.other:addSubMenu("Show Damage On Hp Bar", "HPBAR")
       Config.other.HPBAR:addParam("key","ON/OFF",SCRIPT_PARAM_ONOFF,true)
@@ -203,7 +215,7 @@ function killsteal()
 for _, unit in pairs(GetEnemyHeroes()) do
     local health = unit.health
     local dmgE = getDmg("E", unit, myHero) + ((myHero.ap)*0.7) + ((getDmg("E", unit, myHero) + ((myHero.ap)*0.7))*0.4)
-      if(health<dmgW and Config.killsteal.useE   and Config.killsteal.ks)then
+      if(health<dmgE and Config.killsteal.useE   and Config.killsteal.ks)then
         CastE(unit)  
       end
       local dmgQ = getDmg("Q", unit, myHero) + ((myHero.ap)*0.30)
@@ -235,13 +247,41 @@ function harass()
     end   
   end
 function LaneClear()
-  if Config.laneclear.useQ then
-    QSpell:LaneClear()
+ local cleartarget = nil
+    enemyMinions:update()
+    otherMinions:update()
+    jungleMinions:update()
+    for i, minion in ipairs(enemyMinions.objects) do
+      if ValidTarget(minion, 600) and (cleartarget == nil or not ValidTarget(cleartarget)) then
+        cleartarget = minion
+      end
+    end
+    for i, jungleminion in ipairs(jungleMinions.objects) do
+      if ValidTarget(jungleminion, 600) and (cleartarget == nil or not ValidTarget(cleartarget)) then
+        cleartarget = jungleminion
+      end
+    end
+    for i, otherminion in ipairs(otherMinions.objects) do
+      if ValidTarget(otherminion, 600) and (cleartarget == nil or not ValidTarget(cleartarget)) then
+        cleartarget = otherminion
+      end
+    end
+    if cleartarget ~= nil then
+      if Config.laneclear.useQ and Config.laneclear.laneclearkey then
+        CastQ(cleartarget)
+      end
+      if Config.laneclear.useE and Config.laneclear.laneclearkey then
+        CastE(cleartarget)
+      end
+    end
   end
-if Config.laneclear.useE then
-    ESpell:LaneClear()
-end
-end
+
+function autozhonya()
+  if Config.item.enableautozhonya then
+    if myHero.health <= (myHero.maxHealth * Config.item.autozhonya / 100) then CastItem(3157) 
+    end
+  end
+  end
 function OnProcessAttack(unit, spell) 
   
   if unit.isMe and spell ~= nil then
@@ -395,4 +435,110 @@ function RequireSimpleLib()
         end)
         return false
     end
+end
+function GetSlotItem(id, unit)
+  
+  unit    = unit or myHero
+
+  if (not ItemNames[id]) then
+    return ___GetInventorySlotItem(id, unit)
+  end
+
+  local name  = ItemNames[id]
+  
+  for slot = ITEM_1, ITEM_7 do
+    local item = unit:GetSpellData(slot).name
+    if ((#item > 0) and (item:lower() == name:lower())) then
+      return slot
+    end
+  end
+
+end
+function itemfix()
+
+  ItemNames       = {
+    [3303]        = "ArchAngelsDummySpell",
+    [3007]        = "ArchAngelsDummySpell",
+    [3144]        = "BilgewaterCutlass",
+    [3188]        = "ItemBlackfireTorch",
+    [3153]        = "ItemSwordOfFeastAndFamine",
+    [3405]        = "TrinketSweeperLvl1",
+    [3411]        = "TrinketOrbLvl1",
+    [3166]        = "TrinketTotemLvl1",
+    [3450]        = "OdinTrinketRevive",
+    [2041]        = "ItemCrystalFlask",
+    [2054]        = "ItemKingPoroSnack",
+    [2138]        = "ElixirOfIron",
+    [2137]        = "ElixirOfRuin",
+    [2139]        = "ElixirOfSorcery",
+    [2140]        = "ElixirOfWrath",
+    [3184]        = "OdinEntropicClaymore",
+    [2050]        = "ItemMiniWard",
+    [3401]        = "HealthBomb",
+    [3363]        = "TrinketOrbLvl3",
+    [3092]        = "ItemGlacialSpikeCast",
+    [3460]        = "AscWarp",
+    [3361]        = "TrinketTotemLvl3",
+    [3362]        = "TrinketTotemLvl4",
+    [3159]        = "HextechSweeper",
+    [2051]        = "ItemHorn",
+    --[2003]      = "RegenerationPotion",
+    [3146]        = "HextechGunblade",
+    [3187]        = "HextechSweeper",
+    [3190]        = "IronStylus",
+    [2004]        = "FlaskOfCrystalWater",
+    [3139]        = "ItemMercurial",
+    [3222]        = "ItemMorellosBane",
+    [3042]        = "Muramana",
+    [3043]        = "Muramana",
+    [3180]        = "OdynsVeil",
+    [3056]        = "ItemFaithShaker",
+    [2047]        = "OracleExtractSight",
+    [3364]        = "TrinketSweeperLvl3",
+    [2052]        = "ItemPoroSnack",
+    [3140]        = "QuicksilverSash",
+    [3143]        = "RanduinsOmen",
+    [3074]        = "ItemTiamatCleave",
+    [3800]        = "ItemRighteousGlory",
+    [2045]        = "ItemGhostWard",
+    [3342]        = "TrinketOrbLvl1",
+    [3040]        = "ItemSeraphsEmbrace",
+    [3048]        = "ItemSeraphsEmbrace",
+    [2049]        = "ItemGhostWard",
+    [3345]        = "OdinTrinketRevive",
+    [2044]        = "SightWard",
+    [3341]        = "TrinketSweeperLvl1",
+    [3069]        = "shurelyascrest",
+    [3599]        = "KalistaPSpellCast",
+    [3185]        = "HextechSweeper",
+    [3077]        = "ItemTiamatCleave",
+    [2009]        = "ItemMiniRegenPotion",
+    [2010]        = "ItemMiniRegenPotion",
+    [3023]        = "ItemWraithCollar",
+    [3290]        = "ItemWraithCollar",
+    [2043]        = "VisionWard",
+    [3340]        = "TrinketTotemLvl1",
+    [3090]        = "ZhonyasHourglass",
+    [3154]        = "wrigglelantern",
+    [3142]        = "YoumusBlade",
+    [3157]        = "ZhonyasHourglass",
+    [3512]        = "ItemVoidGate",
+    [3131]        = "ItemSoTD",
+    [3137]        = "ItemDervishBlade",
+    [3352]        = "RelicSpotter",
+    [3350]        = "TrinketTotemLvl2",
+  }
+  
+  _G.ITEM_1       = 06
+  _G.ITEM_2       = 07
+  _G.ITEM_3       = 08
+  _G.ITEM_4       = 09
+  _G.ITEM_5       = 10
+  _G.ITEM_6       = 11
+  _G.ITEM_7       = 12
+  
+  ___GetInventorySlotItem = rawget(_G, "GetInventorySlotItem")
+  _G.GetInventorySlotItem = GetSlotItem
+  
+  
 end
