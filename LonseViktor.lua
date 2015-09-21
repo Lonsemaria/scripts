@@ -74,7 +74,7 @@ end
 function Targetselection()
   ts= TargetSelector(TARGET_LESS_CAST_PRIORITY, 525, DAMAGE_PHYSICAL, false, true)
   tsq= TargetSelector(TARGET_LESS_CAST_PRIORITY, 600, DAMAGE_PHYSICAL, false, true)
-  tsw= TargetSelector(TARGET_CLOSEST, 700, DAMAGE_MAGIC, false, true)
+  tsw= TargetSelector(TARGET_LESS_CAST_PRIORITY, 700, DAMAGE_MAGIC, false, true)
   tse= TargetSelector(TARGET_LESS_CAST_PRIORITY, 650, DAMAGE_MAGIC, false, true)
   tsr= TargetSelector(TARGET_LESS_CAST_PRIORITY, 700, DAMAGE_MAGIC, false, true) 
    QSpell = _Spell({Slot = _Q, DamageName = "Q", Range = math.huge, Width = 1, Delay = 0, Speed = math.huge, Collision = true, Aoe = false, Type = SPELL_TYPE.TARGETTED})
