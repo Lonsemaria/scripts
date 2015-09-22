@@ -3,7 +3,7 @@
 --Script Author:Ensuluyn
 --I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
 --Changelog: V.01 has been realised
-local version = 0.01
+local version = 0.02
 local author = "Ensuluyn"
 local SCRIPT_NAME = "LonseViktor"
 local AUTOUPDATE = true
@@ -11,7 +11,7 @@ local UPDATE_HOST = "raw.github.com"
 local UPDATE_PATH = "/Lonsemaria/scripts/master/LonseViktor.lua".."?rand="..math.random(1,10000)
 local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
 local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
-
+require 'HPrediction'
 function Say(text)
   print("<font color=\"#FF0000\"><b>LonseViktor:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
 end
@@ -72,16 +72,19 @@ end
    if _Required():Add({Name = "DrawDamageLib", Url = "raw.githubusercontent.com/innerout/BotOfLegends/master/DrawDamageLib.lua"}):Check():IsDownloading() then return end 
 end
 function Targetselection()
-  ts= TargetSelector(TARGET_LESS_CAST_PRIORITY, 525, DAMAGE_PHYSICAL, false, true)
+ ts= TargetSelector(TARGET_LESS_CAST_PRIORITY, 525, DAMAGE_PHYSICAL, false, true)
   tsq= TargetSelector(TARGET_LESS_CAST_PRIORITY, 600, DAMAGE_PHYSICAL, false, true)
   tsw= TargetSelector(TARGET_LESS_CAST_PRIORITY, 700, DAMAGE_MAGIC, false, true)
-  tse= TargetSelector(TARGET_LESS_CAST_PRIORITY, 650, DAMAGE_MAGIC, false, true)
+  tse= TargetSelector(TARGET_LESS_CAST_PRIORITY, 1200, DAMAGE_MAGIC, false, true)
   tsr= TargetSelector(TARGET_LESS_CAST_PRIORITY, 700, DAMAGE_MAGIC, false, true) 
    QSpell = _Spell({Slot = _Q, DamageName = "Q", Range = math.huge, Width = 1, Delay = 0, Speed = math.huge, Collision = true, Aoe = false, Type = SPELL_TYPE.TARGETTED})
    WSpell = _Spell({Slot = _W, DamageName = "W", Range = math.huge, Width = 125, Delay = 0.5, Speed = 750, Collision = false, Aoe = true, Type = SPELL_TYPE.CIRCULAR})
-   ESpell = _Spell({Slot = _E, DamageName = "E", Range = math.huge, Width = 90, Delay = 0, Speed = math.huge, Collision = true, Aoe = false, Type = SPELL_TYPE.LINEAR})
+   ESpell = _Spell({Slot = _E, DamageName = "E", Range = 1200, Width = 90, Delay = 0, Speed = math.huge, Collision = true, Aoe = false, Type = SPELL_TYPE.LINEAR})
    RSpell = _Spell({Slot = _R, DamageName = "R", Range =700, Width = 0, Delay = 0.25, Speed = 1000, Collision = false, Aoe = true, Type = SPELL_TYPE.CIRCULAR})
    Ignite = _Spell({Slot = FindSummonerSlot("summonerdot"), DamageName = "IGNITE", Range = 600, Type = SPELL_TYPE.TARGETTED})
+   HPred = HPrediction()
+   E = {Range1 = 550, Range2 = 700, width = 180, ready}
+   ERange = E.Range1+E.Range2
 --|> Minion Managers
     enemyMinions   = minionManager(MINION_ENEMY,   650, myHero, MINION_SORT_MAXHEALTH_DEC)
     allyMinions    = minionManager(MINION_ALLY,   650, myHero, MINION_SORT_MAXHEALTH_DEC)
@@ -100,13 +103,15 @@ function OnTick()
   if(Config.killsteal.ks ) then
     killsteal()
   end
-  if(Config.harass.toggle==true or Config.harass.harasskey  ) then
+  if(Config.harass.harasskey  ) then
     harass()
   end
     end
 function Menu()
       Config=scriptConfig("LonseViktor","menu")
-    
+      Config:addSubMenu("Hitchance", "hit")
+      Config.hit:addParam("E", "E HitChance (Default value = 1.6)", SCRIPT_PARAM_SLICE, 1.6, 1, 3, 2)
+     
       Config:addSubMenu("Combo Settings", "combo")
       Config.combo:addParam("combokey", "Combo Key", SCRIPT_PARAM_ONKEYDOWN, false, 32)
       Config.combo:addParam("useQ", "Use Q in Combo", SCRIPT_PARAM_ONOFF, true)
@@ -117,9 +122,9 @@ function Menu()
       
       Config:addSubMenu("Harass Settings", "harass")
       Config.harass:addParam("harasskey", "Smart Harass Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("C"))
-      Config.harass:addParam("toggle", "Toggle Harass", SCRIPT_PARAM_ONKEYTOGGLE, false, string.byte("L"))
       Config.harass:addParam("useQ", "Harass With Q", SCRIPT_PARAM_ONOFF, true)
       Config.harass:addParam("useE", "Harass With E", SCRIPT_PARAM_ONOFF, true)
+      Config.harass:addParam("E", "E HitChance (Default value = 2)", SCRIPT_PARAM_SLICE, 2, 1, 3, 2)
       
       Config:addSubMenu("Lane&Jungleclear Settings","laneclear")
       Config.laneclear:addParam("laneclearkey", "Lane Clear Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("V"))
@@ -154,7 +159,7 @@ function Menu()
     Config.targetsel:addTS(tsr) 
     Config:addSubMenu("Keys Settings", "Keys")
     OrbwalkManager:LoadCommonKeys(Config.Keys)
-    
+    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.02")
 end
 function OnDraw()
   if(Config.other.HPBAR.key and check==1 )then
@@ -202,7 +207,23 @@ function CastW(unit)
 end
 
 function CastE(unit)
-  ESpell:Cast(unit)
+ 
+  if unit.dead or unit.health == 0 then
+    return
+  end
+  
+  if GetDistance(unit, myHero) > E.Range1-5 then
+   EStartPos = CircleIntersection(myHero, unit, myHero, E.Range1-5)
+  else
+   EStartPos = Vector(unit.x, unit.y, unit.z)
+  end
+  
+   EPos, EHitChance = HPred:GetPredict(HPred.Presets['Viktor']["E"], unit, EStartPos)
+  
+  if mode == "Combo" and EHitChance >= Config.hit.E or mode == "Harass" and EHitChance >= Config.harass.E or  mode == nil and EHitChance > 1 then
+    CastSpell3(_E, D3DXVECTOR3(EStartPos.x, 0, EStartPos.z), D3DXVECTOR3(EPos.x, 0, EPos.z))
+  end
+  
 end
 
 function CastR(unit)
@@ -236,16 +257,18 @@ end
 function harass()
   ts:update()
   tsq:update()
-  if Config.harass.harasskey or Config.harass.toggle then
+  if Config.harass.harasskey then
       if(tsq.target~=nil and Config.harass.useQ ) then        
         CastQ(tsq.target)
       end   
       tse:update()
-      if(tse.target~=nil and Config.harass.useE )then
-         CastE(tse.target) 
+       if tse.target ~= nil and Config.harass.useE  and ValidTarget(tse.target, ERange) then
+      CastE(tse.target)
+  end
+
       end
     end   
-  end
+ 
 function LaneClear()
  local cleartarget = nil
     enemyMinions:update()
@@ -296,7 +319,7 @@ function OnProcessAttack(unit, spell)
      if spell.name:lower():find("attack") then
     tse:update()
     if(tse.target~=nil and Config.combo.useW and Config.combo.combokey  )then
-    ESpell:Cast(tse.target)
+    CastE(tse.target)
     end
    end
   end 
@@ -542,3 +565,41 @@ function itemfix()
   
   
 end
+function CircleIntersection(v1, v2, c, radius)
+  assert(VectorType(v1) and VectorType(v2) and VectorType(c) and type(radius) == "number", "CircleIntersection: wrong argument types (<Vector>, <Vector>, <Vector>, integer expected)")
+  
+  local x1, y1, x2, y2, x3, y3 = v1.x, v1.z or v1.y, v2.x, v2.z or v2.y, c.x, c.z or c.y
+  local r = radius
+  local xp, yp, xm, ym = nil, nil, nil, nil
+  local IsOnSegment = nil
+  
+  if x1 == x2 then
+  
+    local B = math.sqrt(r^2-(x1-x3)^2)
+    
+    xp, yp, xm, ym = x1, y3+B, x1, y3-B
+  else
+  
+    local m = (y2-y1)/(x2-x1)
+    local n = y1-m*x1
+    local A = x3-m*(n-y3)
+    local B = math.sqrt(A^2-(1+m^2)*(x3^2-r^2+(n-y3)^2))
+    
+    xp, xm = (A+B)/(1+m^2), (A-B)/(1+m^2)
+    yp, ym = m*xp+n, m*xm+n
+  end
+  
+  if x1 <= x2 then
+    IsOnSegment = x1 <= xp and xp <= x2
+  else
+    IsOnSegment = x2 <= xp and xp <= x1        
+  end
+    if IsOnSegment then
+    return Vector(xp, 0, yp)
+  else
+    return Vector(xm, 0, ym)
+  end
+  
+end
+
+
