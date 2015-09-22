@@ -2,8 +2,7 @@
 --Script Version:0.01
 --Script Author:Ensuluyn
 --I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
---Changelog: V.01 has been realised
-local version = 0.02
+local version = 0.03
 local author = "Ensuluyn"
 local SCRIPT_NAME = "LonseViktor"
 local AUTOUPDATE = true
@@ -119,12 +118,14 @@ function Menu()
       Config.combo:addParam("useE", "Use E in combo", SCRIPT_PARAM_ONOFF, true)
       Config.combo:addParam("useR", "Use R in combo", SCRIPT_PARAM_ONOFF, true)
       Config.combo:addParam("useI", "Use Ignite if target killable", SCRIPT_PARAM_ONOFF, true)
+      Config.combo:addParam("Mana","Mana Manager %",SCRIPT_PARAM_SLICE, 10, 10, 100, 0)
       
       Config:addSubMenu("Harass Settings", "harass")
       Config.harass:addParam("harasskey", "Smart Harass Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("C"))
       Config.harass:addParam("useQ", "Harass With Q", SCRIPT_PARAM_ONOFF, true)
       Config.harass:addParam("useE", "Harass With E", SCRIPT_PARAM_ONOFF, true)
       Config.harass:addParam("E", "E HitChance (Default value = 2)", SCRIPT_PARAM_SLICE, 2, 1, 3, 2)
+      Config.harass:addParam("Mana","Mana Manager %",SCRIPT_PARAM_SLICE, 30, 10, 100, 0)
       
       Config:addSubMenu("Lane&Jungleclear Settings","laneclear")
       Config.laneclear:addParam("laneclearkey", "Lane Clear Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("V"))
@@ -159,7 +160,7 @@ function Menu()
     Config.targetsel:addTS(tsr) 
     Config:addSubMenu("Keys Settings", "Keys")
     OrbwalkManager:LoadCommonKeys(Config.Keys)
-    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.02")
+    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.03")
 end
 function OnDraw()
   if(Config.other.HPBAR.key and check==1 )then
@@ -168,18 +169,18 @@ function OnDraw()
 end
 function combo()
       tsq:update()
-    if( tsq.target~=nil  and Config.combo.useQ and Config.combo.combokey  )then
+    if(QSpell:IsReady() and (myHero.mana / myHero.maxMana > Config.combo.Mana /100 )and tsq.target~=nil  and Config.combo.useQ and Config.combo.combokey  )then
         CastQ(tsq.target)
     end
     tse:update()
-    if(tse.target~=nil and Config.combo.useE and Config.combo.combokey  )then
+    if(ESpell:IsReady() and (myHero.mana / myHero.maxMana > Config.combo.Mana /100 )and tse.target~=nil and Config.combo.useE and Config.combo.combokey  )then
         CastE(tse.target)
     end
     tsw:update()
-    if(tsw.target~=nil and Config.combo.useW and  Config.combo.combokey  )then
+    if(WSpell:IsReady() and (myHero.mana / myHero.maxMana > Config.combo.Mana /100 ) and tsw.target~=nil and Config.combo.useW and  Config.combo.combokey  )then
         CastW(tsw.target)
     end
-    if(Config.combo.useR and Config.combo.combokey )then
+    if(RSpell:IsReady() and (myHero.mana / myHero.maxMana > Config.combo.Mana /100 ) and Config.combo.useR and Config.combo.combokey )then
     for _, unit in pairs(GetEnemyHeroes()) do
       local dmgR =getDmg("R",unit,myHero)+ ((myHero.ap)*0.55) 
       local health=unit.health
@@ -236,11 +237,11 @@ function killsteal()
 for _, unit in pairs(GetEnemyHeroes()) do
     local health = unit.health
     local dmgE = getDmg("E", unit, myHero) + ((myHero.ap)*0.7) + ((getDmg("E", unit, myHero) + ((myHero.ap)*0.7))*0.4)
-      if(health<dmgE and Config.killsteal.useE   and Config.killsteal.ks)then
+      if(ESpell:IsReady() and health<dmgE and Config.killsteal.useE   and Config.killsteal.ks)then
         CastE(unit)  
       end
       local dmgQ = getDmg("Q", unit, myHero) + ((myHero.ap)*0.30)
-      if(health<dmgQ and Config.killsteal.useQ and Config.killsteal.ks )then
+      if(QSpell:IsReady() and health<dmgQ and Config.killsteal.useQ and Config.killsteal.ks )then
         CastQ(unit)  
       end
        local dmgI =(50+ ((myHero.level)*20))
@@ -248,7 +249,7 @@ for _, unit in pairs(GetEnemyHeroes()) do
         CastI(unit)
       end
       local dmgR =getDmg("R",unit,myHero)+((myHero.ap)*0.55) 
-      if(health<dmgR and Config.killsteal.useR and Config.killsteal.ks and GetDistance(unit)<700)then
+      if(RSpell:IsReady() and health<dmgR and Config.killsteal.useR and Config.killsteal.ks and GetDistance(unit)<700)then
         CastR(unit)
       end
    end
@@ -258,11 +259,11 @@ function harass()
   ts:update()
   tsq:update()
   if Config.harass.harasskey then
-      if(tsq.target~=nil and Config.harass.useQ ) then        
+      if(QSpell:IsReady() and (myHero.mana / myHero.maxMana > Config.harass.Mana /100 ) and tsq.target~=nil and Config.harass.useQ ) then        
         CastQ(tsq.target)
       end   
       tse:update()
-       if tse.target ~= nil and Config.harass.useE  and ValidTarget(tse.target, ERange) then
+       if(ESpell:IsReady() and (myHero.mana / myHero.maxMana > Config.harass.Mana /100 ) and tse.target ~= nil and Config.harass.useE  and ValidTarget(tse.target, ERange)) then
       CastE(tse.target)
   end
 
@@ -290,10 +291,10 @@ function LaneClear()
       end
     end
     if cleartarget ~= nil then
-      if Config.laneclear.useQ and Config.laneclear.laneclearkey then
+      if(QSpell:IsReady() and Config.laneclear.useQ and Config.laneclear.laneclearkey) then
         CastQ(cleartarget)
       end
-      if Config.laneclear.useE and Config.laneclear.laneclearkey then
+      if(ESpell:IsReady() and Config.laneclear.useE and Config.laneclear.laneclearkey) then
         CastE(cleartarget)
       end
     end
@@ -310,7 +311,7 @@ function OnProcessAttack(unit, spell)
   if unit.isMe and spell ~= nil then
      if spell.name:lower():find("attack") then
     tsq:update()
-    if(tsq.target~=nil  and Config.combo.useQ and Config.combo.combokey )then
+    if(QSpell:IsReady() and tsq.target~=nil  and Config.combo.useQ and Config.combo.combokey )then
     QSpell:Cast(tsq.target)
     end
    end
@@ -318,7 +319,7 @@ function OnProcessAttack(unit, spell)
   if unit.isMe and spell ~= nil then
      if spell.name:lower():find("attack") then
     tse:update()
-    if(tse.target~=nil and Config.combo.useW and Config.combo.combokey  )then
+    if(ESpell:IsReady() and tse.target~=nil and Config.combo.useW and Config.combo.combokey  )then
     CastE(tse.target)
     end
    end
@@ -326,7 +327,7 @@ function OnProcessAttack(unit, spell)
   if unit.isMe and spell ~= nil then
      if spell.name:lower():find("attack") then
     tsw:update()
-    if(tsw.target~=nil  and Config.combo.useW and Config.combo.combokey )then
+    if(WSpell:IsReady() and tsw.target~=nil  and Config.combo.useW and Config.combo.combokey )then
     WSpell:Cast(tsw.target)
     end
    end
@@ -335,7 +336,7 @@ function OnProcessAttack(unit, spell)
   if unit.isMe and spell ~= nil then
      if spell.name:lower():find("attack") then
     tsr:update()
-    if(tsr.target~=nil  and Config.combo.useR and Config.combo.combokey )then
+    if(RSpell:IsReady() and tsr.target~=nil  and Config.combo.useR and Config.combo.combokey )then
     RSpell:Cast(tsr.target)
     end
    end
