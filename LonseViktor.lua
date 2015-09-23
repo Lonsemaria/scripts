@@ -2,7 +2,7 @@
 --Script Version:0.01
 --Script Author:Ensuluyn
 --I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
-local version = 0.03
+local version = 0.04
 local author = "Ensuluyn"
 local SCRIPT_NAME = "LonseViktor"
 local AUTOUPDATE = true
@@ -78,7 +78,7 @@ function Targetselection()
   tsr= TargetSelector(TARGET_LESS_CAST_PRIORITY, 700, DAMAGE_MAGIC, false, true) 
    QSpell = _Spell({Slot = _Q, DamageName = "Q", Range = math.huge, Width = 1, Delay = 0, Speed = math.huge, Collision = true, Aoe = false, Type = SPELL_TYPE.TARGETTED})
    WSpell = _Spell({Slot = _W, DamageName = "W", Range = math.huge, Width = 125, Delay = 0.5, Speed = 750, Collision = false, Aoe = true, Type = SPELL_TYPE.CIRCULAR})
-   ESpell = _Spell({Slot = _E, DamageName = "E", Range = 1200, Width = 90, Delay = 0, Speed = math.huge, Collision = true, Aoe = false, Type = SPELL_TYPE.LINEAR})
+   ESpell = _Spell({Slot = _E, DamageName = "E", Range = 1200, Width = 90, Delay = 0, Speed = math.huge, Collision = true, Aoe = false, Type = SPELL_TYPE.LINEAR}):AddDraw()
    RSpell = _Spell({Slot = _R, DamageName = "R", Range =700, Width = 0, Delay = 0.25, Speed = 1000, Collision = false, Aoe = true, Type = SPELL_TYPE.CIRCULAR})
    Ignite = _Spell({Slot = FindSummonerSlot("summonerdot"), DamageName = "IGNITE", Range = 600, Type = SPELL_TYPE.TARGETTED})
    HPred = HPrediction()
@@ -131,7 +131,8 @@ function Menu()
       Config.laneclear:addParam("laneclearkey", "Lane Clear Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("V"))
       Config.laneclear:addParam("useQ","Use Q on Laneclear",SCRIPT_PARAM_ONOFF,true)
       Config.laneclear:addParam("useE","Use E on Laneclear",SCRIPT_PARAM_ONOFF,true)
-      
+      Config.laneclear:addParam("Mana","Mana Manager %",SCRIPT_PARAM_SLICE, 30, 10, 100, 0)
+       
       Config:addSubMenu("KillSteal Settings", "killsteal")
       Config.killsteal:addParam("ks","Killsteal On/Off",SCRIPT_PARAM_ONOFF,true)
       Config.killsteal:addParam("useQ", "Steal With Q", SCRIPT_PARAM_ONOFF, true)
@@ -160,7 +161,7 @@ function Menu()
     Config.targetsel:addTS(tsr) 
     Config:addSubMenu("Keys Settings", "Keys")
     OrbwalkManager:LoadCommonKeys(Config.Keys)
-    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.03")
+    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.04")
 end
 function OnDraw()
   if(Config.other.HPBAR.key and check==1 )then
@@ -291,14 +292,48 @@ function LaneClear()
       end
     end
     if cleartarget ~= nil then
-      if(QSpell:IsReady() and Config.laneclear.useQ and Config.laneclear.laneclearkey) then
+      if(QSpell:IsReady() and Config.laneclear.useQ and Config.laneclear.laneclearkey) and (myHero.mana / myHero.maxMana > Config.laneclear.Mana /100 ) then
         CastQ(cleartarget)
       end
-      if(ESpell:IsReady() and Config.laneclear.useE and Config.laneclear.laneclearkey) then
-        CastE(cleartarget)
+     if cleartarget ~= nil then
+      if(ESpell:IsReady() and Config.laneclear.useE and Config.laneclear.laneclearkey) and (myHero.mana / myHero.maxMana > Config.laneclear.Mana /100 ) then
+      local BestPos, BestHit = GetBestLineFarmPosition(ESpell.Range, ESpell.Width, enemyMinions.objects)
+      if BestPos ~= nil and BestHit >= 3 then
+       CastSpell(_E, BestPos.x, BestPos.z)
       end
     end
   end
+  end
+  end
+function GetBestLineFarmPosition(range, width, objects)
+    local BestPos 
+    local BestHit = 0
+    for i, object in ipairs(objects) do
+        local EndPos = Vector(myHero.pos) + range * (Vector(object) - Vector(myHero.pos)):normalized()
+        local hit = CountObjectsOnLineSegment(myHero.pos, EndPos, width, objects)
+        if hit > BestHit then
+            BestHit = hit
+            BestPos = Vector(object)
+            if BestHit == #objects then
+               break
+            end
+         end
+    end
+
+    return BestPos, BestHit
+end
+
+function CountObjectsOnLineSegment(StartPos, EndPos, width, objects)
+    local n = 0
+    for i, object in ipairs(objects) do
+        local pointSegment, pointLine, isOnSegment = VectorPointProjectionOnLineSegment(StartPos, EndPos, object)
+        if isOnSegment and GetDistanceSqr(pointSegment, object) < width * width then
+            n = n + 1
+        end
+    end
+
+    return n
+end
 
 function autozhonya()
   if Config.item.enableautozhonya then
