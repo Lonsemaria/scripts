@@ -1,8 +1,7 @@
 --Script Name:LonseViktor
---Script Version:0.01
 --Script Author:Ensuluyn
 --I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
-local version = 0.04
+local version = 0.05
 local author = "Ensuluyn"
 local SCRIPT_NAME = "LonseViktor"
 local AUTOUPDATE = true
@@ -134,7 +133,7 @@ function Menu()
       Config.laneclear:addParam("Mana","Mana Manager %",SCRIPT_PARAM_SLICE, 30, 10, 100, 0)
        
       Config:addSubMenu("KillSteal Settings", "killsteal")
-      Config.killsteal:addParam("ks","Killsteal On/Off",SCRIPT_PARAM_ONOFF,true)
+      Config.killsteal:addParam("ks","Killsteal On/Off",SCRIPT_PARAM_ONOFF,false)
       Config.killsteal:addParam("useQ", "Steal With Q", SCRIPT_PARAM_ONOFF, true)
       Config.killsteal:addParam("useE", "Steal With E", SCRIPT_PARAM_ONOFF, true)
       Config.killsteal:addParam("useR", "Steal With R", SCRIPT_PARAM_ONOFF, true)
@@ -161,7 +160,7 @@ function Menu()
     Config.targetsel:addTS(tsr) 
     Config:addSubMenu("Keys Settings", "Keys")
     OrbwalkManager:LoadCommonKeys(Config.Keys)
-    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.04")
+    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.05")
 end
 function OnDraw()
   if(Config.other.HPBAR.key and check==1 )then
@@ -341,45 +340,7 @@ function autozhonya()
     end
   end
   end
-function OnProcessAttack(unit, spell) 
-  
-  if unit.isMe and spell ~= nil then
-     if spell.name:lower():find("attack") then
-    tsq:update()
-    if(QSpell:IsReady() and tsq.target~=nil  and Config.combo.useQ and Config.combo.combokey )then
-    QSpell:Cast(tsq.target)
-    end
-   end
-  end 
-  if unit.isMe and spell ~= nil then
-     if spell.name:lower():find("attack") then
-    tse:update()
-    if(ESpell:IsReady() and tse.target~=nil and Config.combo.useW and Config.combo.combokey  )then
-    CastE(tse.target)
-    end
-   end
-  end 
-  if unit.isMe and spell ~= nil then
-     if spell.name:lower():find("attack") then
-    tsw:update()
-    if(WSpell:IsReady() and tsw.target~=nil  and Config.combo.useW and Config.combo.combokey )then
-    WSpell:Cast(tsw.target)
-    end
-   end
-  end 
- 
-  if unit.isMe and spell ~= nil then
-     if spell.name:lower():find("attack") then
-    tsr:update()
-    if(RSpell:IsReady() and tsr.target~=nil  and Config.combo.useR and Config.combo.combokey )then
-    RSpell:Cast(tsr.target)
-    end
-   end
-  end 
-  
- 
-  
-end
+
 function RequireSimpleLib()
     if FileExist(LIB_PATH.."SimpleLib.lua") and not FileExist(SCRIPT_PATH.."SimpleLib.lua") then
         require "SimpleLib"
