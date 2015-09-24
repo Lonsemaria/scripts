@@ -1,7 +1,7 @@
 --Script Name:LonseViktor
 --Script Author:Ensuluyn
 --I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
-local version = 0.05
+local version = 0.06
 local author = "Ensuluyn"
 local SCRIPT_NAME = "LonseViktor"
 local AUTOUPDATE = true
@@ -98,6 +98,9 @@ function OnTick()
   if(Config.laneclear.laneclearkey)then
     LaneClear()
   end
+    if(Config.jungleclear.jungleclearkey)then
+    JungleClear()
+  end
   if(Config.killsteal.ks ) then
     killsteal()
   end
@@ -126,14 +129,20 @@ function Menu()
       Config.harass:addParam("E", "E HitChance (Default value = 2)", SCRIPT_PARAM_SLICE, 2, 1, 3, 2)
       Config.harass:addParam("Mana","Mana Manager %",SCRIPT_PARAM_SLICE, 30, 10, 100, 0)
       
-      Config:addSubMenu("Lane&Jungleclear Settings","laneclear")
+      Config:addSubMenu("LaneClear Settings","laneclear")
       Config.laneclear:addParam("laneclearkey", "Lane Clear Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("V"))
       Config.laneclear:addParam("useQ","Use Q on Laneclear",SCRIPT_PARAM_ONOFF,true)
       Config.laneclear:addParam("useE","Use E on Laneclear",SCRIPT_PARAM_ONOFF,true)
       Config.laneclear:addParam("Mana","Mana Manager %",SCRIPT_PARAM_SLICE, 30, 10, 100, 0)
+      
+      Config:addSubMenu("JungleClear Settings","jungleclear")
+      Config.jungleclear:addParam("jungleclearkey", "JungleClear Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("V"))
+      Config.jungleclear:addParam("useQ","Use Q on jungleclear",SCRIPT_PARAM_ONOFF,true)
+      Config.jungleclear:addParam("useE","Use E on jungleclear",SCRIPT_PARAM_ONOFF,true)
+      Config.jungleclear:addParam("Mana","Mana Manager %",SCRIPT_PARAM_SLICE, 30, 10, 100, 0)
        
       Config:addSubMenu("KillSteal Settings", "killsteal")
-      Config.killsteal:addParam("ks","Killsteal On/Off",SCRIPT_PARAM_ONOFF,false)
+      Config.killsteal:addParam("ks","Killsteal On/Off",SCRIPT_PARAM_ONOFF,true)
       Config.killsteal:addParam("useQ", "Steal With Q", SCRIPT_PARAM_ONOFF, true)
       Config.killsteal:addParam("useE", "Steal With E", SCRIPT_PARAM_ONOFF, true)
       Config.killsteal:addParam("useR", "Steal With R", SCRIPT_PARAM_ONOFF, true)
@@ -160,7 +169,7 @@ function Menu()
     Config.targetsel:addTS(tsr) 
     Config:addSubMenu("Keys Settings", "Keys")
     OrbwalkManager:LoadCommonKeys(Config.Keys)
-    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.05")
+    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.06")
 end
 function OnDraw()
   if(Config.other.HPBAR.key and check==1 )then
@@ -237,11 +246,11 @@ function killsteal()
 for _, unit in pairs(GetEnemyHeroes()) do
     local health = unit.health
     local dmgE = getDmg("E", unit, myHero) + ((myHero.ap)*0.7) + ((getDmg("E", unit, myHero) + ((myHero.ap)*0.7))*0.4)
-      if(ESpell:IsReady() and health<dmgE and Config.killsteal.useE   and Config.killsteal.ks)then
+      if(tse.target ~= nil and  ESpell:IsReady() and health<dmgE and Config.killsteal.useE   and Config.killsteal.ks)then
         CastE(unit)  
       end
       local dmgQ = getDmg("Q", unit, myHero) + ((myHero.ap)*0.30)
-      if(QSpell:IsReady() and health<dmgQ and Config.killsteal.useQ and Config.killsteal.ks )then
+      if(tsq.target ~= nil and  QSpell:IsReady() and health<dmgQ and Config.killsteal.useQ and Config.killsteal.ks )then
         CastQ(unit)  
       end
        local dmgI =(50+ ((myHero.level)*20))
@@ -249,7 +258,7 @@ for _, unit in pairs(GetEnemyHeroes()) do
         CastI(unit)
       end
       local dmgR =getDmg("R",unit,myHero)+((myHero.ap)*0.55) 
-      if(RSpell:IsReady() and health<dmgR and Config.killsteal.useR and Config.killsteal.ks and GetDistance(unit)<700)then
+      if(tsr.target ~= nil and  RSpell:IsReady() and health<dmgR and Config.killsteal.useR and Config.killsteal.ks and GetDistance(unit)<700)then
         CastR(unit)
       end
    end
@@ -296,7 +305,7 @@ function LaneClear()
       end
      if cleartarget ~= nil then
       if(ESpell:IsReady() and Config.laneclear.useE and Config.laneclear.laneclearkey) and (myHero.mana / myHero.maxMana > Config.laneclear.Mana /100 ) then
-      local BestPos, BestHit = GetBestLineFarmPosition(ESpell.Range, ESpell.Width, enemyMinions.objects)
+      local BestPos, BestHit = GetBestLineFarmPosition(ESpell.Range, ESpell.Width, enemyMinions.objects )
       if BestPos ~= nil and BestHit >= 3 then
        CastSpell(_E, BestPos.x, BestPos.z)
       end
@@ -304,9 +313,40 @@ function LaneClear()
   end
   end
   end
+  function JungleClear()
+ local cleartarget = nil
+    enemyMinions:update()
+    otherMinions:update()
+    jungleMinions:update()
+    for i, minion in ipairs(enemyMinions.objects) do
+      if ValidTarget(minion, 600) and (cleartarget == nil or not ValidTarget(cleartarget)) then
+        cleartarget = minion
+      end
+    end
+    for i, jungleminion in ipairs(jungleMinions.objects) do
+      if ValidTarget(jungleminion, 600) and (cleartarget == nil or not ValidTarget(cleartarget)) then
+        cleartarget = jungleminion
+      end
+    end
+    for i, otherminion in ipairs(otherMinions.objects) do
+      if ValidTarget(otherminion, 600) and (cleartarget == nil or not ValidTarget(cleartarget)) then
+        cleartarget = otherminion
+      end
+    end
+    if cleartarget ~= nil then
+      if(QSpell:IsReady() and Config.jungleclear.useQ and Config.jungleclear.jungleclearkey) and (myHero.mana / myHero.maxMana > Config.jungleclear.Mana /100 ) then
+        CastQ(cleartarget)
+      end
+      if cleartarget ~= nil then
+      if(ESpell:IsReady() and Config.jungleclear.useE and Config.jungleclear.jungleclearkey) and (myHero.mana / myHero.maxMana > Config.jungleclear.Mana /100 ) then
+        CastE(cleartarget)
+      end
+    end
+  end
+  end
 function GetBestLineFarmPosition(range, width, objects)
     local BestPos 
-    local BestHit = 0
+    local BestHit = 3
     for i, object in ipairs(objects) do
         local EndPos = Vector(myHero.pos) + range * (Vector(object) - Vector(myHero.pos)):normalized()
         local hit = CountObjectsOnLineSegment(myHero.pos, EndPos, width, objects)
