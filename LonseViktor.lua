@@ -1,7 +1,7 @@
 --Script Name:LonseViktor
 --Script Author:Ensuluyn
 --I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
-local version = 0.06
+local version = 0.07
 local author = "Ensuluyn"
 local SCRIPT_NAME = "LonseViktor"
 local AUTOUPDATE = true
@@ -136,7 +136,7 @@ function Menu()
       Config.laneclear:addParam("Mana","Mana Manager %",SCRIPT_PARAM_SLICE, 30, 10, 100, 0)
       
       Config:addSubMenu("JungleClear Settings","jungleclear")
-      Config.jungleclear:addParam("jungleclearkey", "JungleClear Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("V"))
+      Config.jungleclear:addParam("jungleclearkey", "JungleClear Key", SCRIPT_PARAM_ONKEYDOWN, false, string.byte("Z"))
       Config.jungleclear:addParam("useQ","Use Q on jungleclear",SCRIPT_PARAM_ONOFF,true)
       Config.jungleclear:addParam("useE","Use E on jungleclear",SCRIPT_PARAM_ONOFF,true)
       Config.jungleclear:addParam("Mana","Mana Manager %",SCRIPT_PARAM_SLICE, 30, 10, 100, 0)
@@ -170,6 +170,7 @@ function Menu()
     Config:addSubMenu("Keys Settings", "Keys")
     OrbwalkManager:LoadCommonKeys(Config.Keys)
     Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.06")
+    Config:addParam("LOL", "LOL", SCRIPT_PARAM_INFO, "5.19")
 end
 function OnDraw()
   if(Config.other.HPBAR.key and check==1 )then
@@ -306,7 +307,7 @@ function LaneClear()
      if cleartarget ~= nil then
       if(ESpell:IsReady() and Config.laneclear.useE and Config.laneclear.laneclearkey) and (myHero.mana / myHero.maxMana > Config.laneclear.Mana /100 ) then
       local BestPos, BestHit = GetBestLineFarmPosition(ESpell.Range, ESpell.Width, enemyMinions.objects )
-      if BestPos ~= nil and BestHit >= 3 then
+      if BestPos ~= nil and BestHit >= 2 then
        CastSpell(_E, BestPos.x, BestPos.z)
       end
     end
@@ -318,20 +319,11 @@ function LaneClear()
     enemyMinions:update()
     otherMinions:update()
     jungleMinions:update()
-    for i, minion in ipairs(enemyMinions.objects) do
-      if ValidTarget(minion, 600) and (cleartarget == nil or not ValidTarget(cleartarget)) then
-        cleartarget = minion
-      end
-    end
     for i, jungleminion in ipairs(jungleMinions.objects) do
       if ValidTarget(jungleminion, 600) and (cleartarget == nil or not ValidTarget(cleartarget)) then
         cleartarget = jungleminion
       end
     end
-    for i, otherminion in ipairs(otherMinions.objects) do
-      if ValidTarget(otherminion, 600) and (cleartarget == nil or not ValidTarget(cleartarget)) then
-        cleartarget = otherminion
-      end
     end
     if cleartarget ~= nil then
       if(QSpell:IsReady() and Config.jungleclear.useQ and Config.jungleclear.jungleclearkey) and (myHero.mana / myHero.maxMana > Config.jungleclear.Mana /100 ) then
@@ -342,7 +334,6 @@ function LaneClear()
         CastE(cleartarget)
       end
     end
-  end
   end
 function GetBestLineFarmPosition(range, width, objects)
     local BestPos 
