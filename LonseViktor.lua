@@ -1,7 +1,7 @@
 --Script Name:LonseViktor
 --Script Author:Ensuluyn
 --I'm really new on scripting thats why feel free to give me some feedbacks on forum :)
-local version = 0.07
+local version = 1.08
 local author = "Ensuluyn"
 local SCRIPT_NAME = "LonseViktor"
 local AUTOUPDATE = true
@@ -169,8 +169,7 @@ function Menu()
     Config.targetsel:addTS(tsr) 
     Config:addSubMenu("Keys Settings", "Keys")
     OrbwalkManager:LoadCommonKeys(Config.Keys)
-    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "0.06")
-    Config:addParam("LOL", "LOL", SCRIPT_PARAM_INFO, "5.19")
+    Config:addParam("Version", "Version", SCRIPT_PARAM_INFO, "1.08[5.20]")
 end
 function OnDraw()
   if(Config.other.HPBAR.key and check==1 )then
@@ -307,7 +306,7 @@ function LaneClear()
      if cleartarget ~= nil then
       if(ESpell:IsReady() and Config.laneclear.useE and Config.laneclear.laneclearkey) and (myHero.mana / myHero.maxMana > Config.laneclear.Mana /100 ) then
       local BestPos, BestHit = GetBestLineFarmPosition(ESpell.Range, ESpell.Width, enemyMinions.objects )
-      if BestPos ~= nil and BestHit >= 2 then
+      if BestPos ~= nil and BestHit >= 1 then
        CastSpell(_E, BestPos.x, BestPos.z)
       end
     end
@@ -337,7 +336,7 @@ function LaneClear()
   end
 function GetBestLineFarmPosition(range, width, objects)
     local BestPos 
-    local BestHit = 3
+    local BestHit = 2
     for i, object in ipairs(objects) do
         local EndPos = Vector(myHero.pos) + range * (Vector(object) - Vector(myHero.pos)):normalized()
         local hit = CountObjectsOnLineSegment(myHero.pos, EndPos, width, objects)
@@ -362,6 +361,30 @@ function CountObjectsOnLineSegment(StartPos, EndPos, width, objects)
         end
     end
 
+    return n
+end
+function GetBestCircularFarmPosition(range, radius, objects)
+    local BestPos 
+    local BestHit = 0
+    for i, object in ipairs(objects) do
+        local hit = CountObjectsNearPos(object.pos or object, range, radius, objects)
+        if hit > BestHit then
+            BestHit = hit
+            BestPos = Vector(object)
+            if BestHit == #objects then
+               break
+            end
+         end
+    end
+    return BestPos, BestHit
+end
+function CountObjectsNearPos(pos, range, radius, objects)
+    local n = 0
+    for i, object in ipairs(objects) do
+        if GetDistanceSqr(pos, object) <= radius * radius then
+            n = n + 1
+        end
+    end
     return n
 end
 
