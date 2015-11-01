@@ -1,10 +1,17 @@
 
+
+-- One Click to Challenger
+-- Keyboard Master Series by Ensuluyn
+
+--Credits to Nebelwolfi for mentoring <3
+
 local Version = "2.01"  
 local LVersion = "5.21"
 local Scriptname = "Keyboard Master Series"
 local Author = "Ensuluyn"
 local list = "Leblanc , Lissandra , Viktor"
 local link = "Go to http://forum.botoflegends.com/forum/20-champion-scripts/ then you can see my topic "..Scriptname.." on the first or second page."
+local date = "01.11.2015"
 global_ticks = 0
 -- starting script
 function OnLoad()
@@ -13,7 +20,6 @@ function OnLoad()
         Drawdmglib()
          if _G[myHero.charName] then
                 _G[myHero.charName]()
-        print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\"> has been loaded succesfully." )
         else
          print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\"> :This champion is not supported. Currently supported champions are: "..list.." " )
         DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">Feel free to check my forum topic and ask a new champion or give feedback") end, 0.5)
@@ -104,8 +110,8 @@ self.ts= TargetSelector(TARGET_LESS_CAST_PRIORITY, 525, DAMAGE_PHYSICAL, false, 
       self.Config.item:addParam("autozhonya", "Zhonya if Health under -> %", SCRIPT_PARAM_SLICE, 10, 0, 100, 0)
      
       self.Config:addSubMenu("Draw Settings","other")
-      self.Config.other:addSubMenu("Show Damage On Hp Bar", "HPBAR")
-      self.Config.other.HPBAR:addParam("key","ON/OFF",SCRIPT_PARAM_ONOFF,true)
+      --self.Config.other:addSubMenu("Show Damage On Hp Bar", "HPBAR")
+      --self.Config.other.HPBAR:addParam("key","ON/OFF",SCRIPT_PARAM_ONOFF,true)
       self.Config.other:addSubMenu("Skill Drawing Settings", "draw")
       self.Config.other.draw:addParam("qdraw","Q Skill Drawings",SCRIPT_PARAM_ONOFF,true)
       self.Config.other.draw:addParam("wdraw","W Skill Drawings",SCRIPT_PARAM_ONOFF,true)
@@ -164,9 +170,6 @@ self.ts= TargetSelector(TARGET_LESS_CAST_PRIORITY, 525, DAMAGE_PHYSICAL, false, 
 end
 --drawing settings start
 function Leblanc:Draw()
-  if(self.Config.other.HPBAR.key and check==1 )then
-    drawDamage() 
-  end
    if self.Config.other.draw.qdraw and self.QSpell:IsReady() then
     DrawCircle3D(myHero.x, myHero.y, myHero.z, 650, 1,red)
   end
@@ -1744,12 +1747,12 @@ end
 function Viktor:findorbwalker()
  if _G.Reborn_Loaded then
     SAC=true and
-    DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">Sidas Auto Carry has been found") end, 2)
-        DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">Sidas Auto Carry integration has been finished succesfully") end, 8)
+    DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\">Sidas Auto Carry has been found") end, 2)
+        DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\">Sidas Auto Carry integration has been finished succesfully") end, 8)
   elseif not _G.Reborn_Loaded and FileExist(LIB_PATH .. "SxOrbWalk.lua") then
     SxOrb=true and 
-  DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">SxOrbWalk has been found") end, 2)
-          DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">SxOrbWalk integration has been finished succesfully") end, 4)
+  DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\"> SxOrbWalk has been found") end, 2)
+          DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\"> SxOrbWalk integration has been finished succesfully") end, 4)
     require("SxOrbWalk")
     DelayAction(function()  self.Config:addSubMenu("SxOrbWalk","orbWalk") end,5)
     DelayAction(function() _G.SxOrb:LoadToMenu(self.Config.orbWalk) end,5)
@@ -1764,12 +1767,12 @@ end
 function Lissandra:findorbwalker()
  if _G.Reborn_Loaded then
     SAC=true and
-    DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">Sidas Auto Carry has been found") end, 2)
-        DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">Sidas Auto Carry integration has been finished succesfully") end, 8)
+    DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\">Sidas Auto Carry has been found") end, 2)
+        DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\">Sidas Auto Carry integration has been finished succesfully") end, 8)
   elseif not _G.Reborn_Loaded and FileExist(LIB_PATH .. "SxOrbWalk.lua") then
     SxOrb=true and 
-  DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">SxOrbWalk has been found") end, 2)
-          DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">SxOrbWalk integration has been finished succesfully") end, 4)
+  DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\"> SxOrbWalk has been found") end, 2)
+          DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\"> SxOrbWalk integration has been finished succesfully") end, 4)
     require("SxOrbWalk")
     DelayAction(function()  self.Config:addSubMenu("SxOrbWalk","orbWalk") end,5)
     DelayAction(function() _G.SxOrb:LoadToMenu(self.Config.orbWalk) end,5)
@@ -1784,12 +1787,12 @@ end
 function Leblanc:findorbwalker()
  if _G.Reborn_Loaded then
     SAC=true and
-    DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">Sidas Auto Carry has been found") end, 2)
-        DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">Sidas Auto Carry integration has been finished succesfully") end, 8)
+    DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\">Sidas Auto Carry has been found") end, 2)
+        DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\">Sidas Auto Carry integration has been finished succesfully") end, 8)
   elseif not _G.Reborn_Loaded and FileExist(LIB_PATH .. "SxOrbWalk.lua") then
     SxOrb=true and 
-  DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">SxOrbWalk has been found") end, 2)
-          DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#CBF6FF\">SxOrbWalk integration has been finished succesfully") end, 4)
+  DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\"> SxOrbWalk has been found") end, 2)
+          DelayAction(function() print("<font color=\"#FF0000\"><b> "..Scriptname.." - </b></font><font color=\"#FFFFFF\"> SxOrbWalk integration has been finished succesfully") end, 4)
     require("SxOrbWalk")
     DelayAction(function()  self.Config:addSubMenu("SxOrbWalk","orbWalk") end,5)
     DelayAction(function() _G.SxOrb:LoadToMenu(self.Config.orbWalk) end,5)
@@ -1886,10 +1889,10 @@ if AUTOUPDATE then
         Say("Updating, please don't press F9")
         DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () Say("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end) end, 3)
       else
-        Say("You have got the latest version (v"..ServerVersion..") of "..Scriptname.." by " .. author)
+        Say("-Welcome, You have got the latest version (v"..ServerVersion..") of "..Scriptname.." , updated at ("..date..") by " .. author)
       end
     end
-  else
+  else 
     Say("Error downloading version info")
   end
 end
