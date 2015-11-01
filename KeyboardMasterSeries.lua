@@ -14,10 +14,39 @@ local link = "Go to http://forum.botoflegends.com/forum/20-champion-scripts/ the
 local date = "01.11.2015"
 global_ticks = 0
 -- starting script
+--auto update
+local version = 2.01
+local author = "Ensuluyn"
+local SCRIPT_NAME = "KeyboardMasterSeries"
+local AUTOUPDATE = true
+local UPDATE_HOST = "raw.github.com"
+local UPDATE_PATH = "/Lonsemaria/scripts/master/KeyboardMasterSeries.lua".."?rand="..math.random(1,10000)
+local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
+local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
+function Say(text)
+  print("<font color=\"#FF0000\"><b>Keyboard Master Series:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
+end
+
+if AUTOUPDATE then
+  local ServerData = GetWebResult(UPDATE_HOST, "/Lonsemaria/scripts/master/version/Bundle.version")
+  if ServerData then
+    ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
+    if ServerVersion then
+      if tonumber(version) < ServerVersion then
+        Say("New version available "..ServerVersion)
+        Say("Updating, please don't press F9")
+        DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () Say("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end) end, 3)
+      else
+        Say("-Welcome, You have got the latest version (v"..ServerVersion..") of "..Scriptname.." , updated at ("..date..") by " .. author)
+      end
+    end
+  else 
+    Say("Error downloading version info")
+  end
+end
 function OnLoad()
         if not RequireSimpleLib() then return end
         itemfix()
-        Drawdmglib()
          if _G[myHero.charName] then
                 _G[myHero.charName]()
         else
@@ -1866,33 +1895,3 @@ _G.IsKeyDown = function(theKey)
 end;
 --iskeydownfix end
 -- All classic necesseries end
---auto update
-local version = 2.01
-local author = "Ensuluyn"
-local SCRIPT_NAME = "KeyboardMasterSeries"
-local AUTOUPDATE = true
-local UPDATE_HOST = "raw.github.com"
-local UPDATE_PATH = "/Lonsemaria/scripts/master/KeyboardMasterSeries.lua".."?rand="..math.random(1,10000)
-local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
-local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
-function Say(text)
-  print("<font color=\"#FF0000\"><b>Keyboard Master Series:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
-end
-
-if AUTOUPDATE then
-  local ServerData = GetWebResult(UPDATE_HOST, "/Lonsemaria/scripts/master/version/Bundle.version")
-  if ServerData then
-    ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
-    if ServerVersion then
-      if tonumber(version) < ServerVersion then
-        Say("New version available "..ServerVersion)
-        Say("Updating, please don't press F9")
-        DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () Say("Successfully updated. ("..version.." => "..ServerVersion.."), press F9 twice to load the updated version.") end) end, 3)
-      else
-        Say("-Welcome, You have got the latest version (v"..ServerVersion..") of "..Scriptname.." , updated at ("..date..") by " .. author)
-      end
-    end
-  else 
-    Say("Error downloading version info")
-  end
-end
