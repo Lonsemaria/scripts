@@ -1,5 +1,5 @@
 
-local Version = "2.01"  
+local Version = "2.00"  
 local LVersion = "5.21"
 local Scriptname = "Keyboard Master Series"
 local Author = "Ensuluyn"
@@ -1864,12 +1864,12 @@ end;
 --iskeydownfix end
 -- All classic necesseries end
 --auto update
-local version = 2.01
+local version = 2.00
 local author = "Ensuluyn"
 local SCRIPT_NAME = "KeyboardMasterSeries"
 local AUTOUPDATE = true
 local UPDATE_HOST = "raw.github.com"
-local UPDATE_PATH = "/Lonsemaria/scripts/master/KeyboardMasterSeries.lua".."?rand="..math.random(1,10000)
+local UPDATE_PATH = "/Lonsemaria/scripts/master/LonseViktor.lua".."?rand="..math.random(1,10000)
 local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
 local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
 function Say(text)
