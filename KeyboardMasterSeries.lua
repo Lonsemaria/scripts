@@ -3,7 +3,7 @@
 One Click to Challenger
 Keyboard Master Series by Ensuluyn
 Current Leauge Of Legends Version :5.23
-Current Script Version :2.06
+Current Script Version :2.07
 Last Update: 24.11.2015
 --Credits to Nebelwolfi for mentoring <3
 ]]
