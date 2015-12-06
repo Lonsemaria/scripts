@@ -47,6 +47,14 @@ local version = 2.08
   for i = 1, 4 do p:Encode1(0x00) end
   SendPacket(p)
 end
+function SkinChanger()
+local skinsPB = {}
+local skinObjectPos = nil
+local skinHeader = nil
+local dispellHeader = nil
+local skinH = nil
+local skinHPos = nil
+end
   function SendSkinPacket(mObject, skinPB, networkID)
   if (string.find(GetGameVersion(), 'Releases/5.22') ~= nil) then
     local mP = CLoLPacket(0x10E);
