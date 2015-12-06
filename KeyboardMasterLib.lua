@@ -47,26 +47,24 @@ local version = 2.08
   for i = 1, 4 do p:Encode1(0x00) end
   SendPacket(p)
 end
-function SendSkinPacket(mObject, skinPB, networkID)
-  if (string.find(GetGameVersion(), 'Releases/5.20') ~= nil) then
-    local mP = CLoLPacket(0xDC);
+  function SendSkinPacket(mObject, skinPB, networkID)
+  if (string.find(GetGameVersion(), 'Releases/5.22') ~= nil) then
+    local mP = CLoLPacket(0x10E);
 
-    mP.vTable = 0xEF5D84;
+    mP.vTable = 0xFD17D0;
 
     mP:EncodeF(networkID);
     
-    mP:Encode1(0xC3);
-    mP:Encode4(0x00000000);
-    mP:Encode1(0x09);
+    mP:Encode1(0x00);
+    
     if (skinPB == nil) then
-      mP:Encode4(0xE5E5E5E5);
+      mP:Encode4(0xE4E4E4E4);
     else
       mP:Encode1(skinPB);
       for I = 1, 3 do
         mP:Encode1(skinH);
       end;
     end;
-    mP:Encode1(0xB4);
 
     for I = 1, string.len(mObject) do
       mP:Encode1(string.byte(string.sub(mObject, I, I)));
@@ -79,18 +77,30 @@ function SendSkinPacket(mObject, skinPB, networkID)
     mP:Encode4(0x0000000E);
     mP:Encode4(0x0000000F);
     mP:Encode4(0x00000000);
+    mP:Encode4(0x00000000);
+    mP:Encode2(0x0000);
     
     mP:Hide();
     RecvPacket(mP);
-  elseif (string.find(GetGameVersion(), 'Releases/5.21') ~= nil) then
-      local mP = CLoLPacket(0x12A);
-
-      mP.vTable = 0xEA298C;
-
-      mP:EncodeF(networkID);
-      
+  elseif (string.find(GetGameVersion(), 'Releases/5.23') ~= nil) then
+      local mP = CLoLPacket(0x13);
+      mP.vTable = 0xF4FDE0;
+ 
+      mP:EncodeF(myHero.networkID);
       mP:Encode4(0x00000000);
-      mP:Encode2(0x0000);
+      mP:Encode1(0x00);
+   
+      if (skinPB == nil) then
+        mP:Encode4(0x2F2F2F2F);
+      else
+
+        mP:Encode1(skinPB);
+        for I = 1, 3 do
+          mP:Encode1(0x74);
+        end;
+
+      end;
+      mP:Encode1(0x75);
 
       for I = 1, string.len(mObject) do
         mP:Encode1(string.byte(string.sub(mObject, I, I)));
@@ -100,61 +110,212 @@ function SendSkinPacket(mObject, skinPB, networkID)
         mP:Encode1(0x00);
       end;
 
-      mP:Encode4(0x0000000E);
+      mP:Encode4(0x00000000);
       mP:Encode4(0x0000000F);
-      if (skinPB == nil) then
-        mP:Encode4(0x4E4E4E4E);
-      else
-        mP:Encode1(skinPB);
-        for I = 1, 3 do
-          mP:Encode1(skinH);
-        end;
-      end;
       mP:Encode4(0x00000000);
       mP:Encode1(0x00);
-
+      
       mP:Hide();
       RecvPacket(mP);
   end;
 end;
-if (string.find(GetGameVersion(), 'Releases/5.20') ~= nil) then
+if (string.find(GetGameVersion(), 'Releases/5.22') ~= nil) then
   skinsPB = {
-    [1] = 0xE6,
-    [2] = 0x06,
-    [3] = 0x26,
-    [4] = 0x36,
-    [5] = 0x46,
-    [6] = 0x66,
-    [7] = 0x76,
-    [8] = 0x86,
-    [9] = 0xA6,
-    [10] = 0xB6,
-    [11] = 0xC6,
-    [12] = 0xF6,
+    [1] = 0xCA,
+    [10] = 0x20,
+    [8] = 0x3C,
+    [4] = 0x75,
+    [12] = 0x7B,
+    [5] = 0xB4,
+    [9] = 0xC8,
+    [7] = 0xCE,
+    [3] = 0xD4,
+    [11] = 0xD7,
+    [6] = 0xDD,
+    [2] = 0xF9,
   };
-  skinObjectPos = 17;
-  skinHeader = 0xDC;
-  dispellHeader = 0x73;
-  skinH = 0xE6;
-  skinHPos = 12;
-elseif (string.find(GetGameVersion(), 'Releases/5.21') ~= nil) then
+  skinObjectPos = 11;
+  skinHeader = 0x10E;
+  dispellHeader = 0x83;
+  skinH = 0xCA;
+  skinHPos = 7;
+elseif (string.find(GetGameVersion(), 'Releases/5.23') ~= nil) then
     skinsPB = {
-      [1] = 0x52,
-      [2] = 0x3E,
-      [3] = 0x42,
-      [4] = 0x5E,
-      [5] = 0x62,
-      [6] = 0xAE,
-      [7] = 0xB2,
-      [8] = 0xBE,
-      [9] = 0xC2,
-      [10] = 0xCE,
-      [11] = 0xD2,
-      [12] = 0xDE,
+      [1] = 0x74,
+      [10] = 0x04,
+      [8] = 0x14,
+      [4] = 0x34,
+      [12] = 0x44,
+      [5] = 0x54,
+      [9] = 0x84,
+      [7] = 0x94,
+      [3] = 0xB4,
+      [11] = 0xC4,
+      [6] = 0xD4,
+      [2] = 0xF4,
     };
-    skinObjectPos = 12;
-    skinHeader = 0x12A;
-    dispellHeader = 0x79;
-    skinH = 0x52;
-    skinHPos = 36;
+    skinObjectPos = 16;
+    skinHeader = 0x13;
+    dispellHeader = 0x13B;
+    skinH = 0x74;
+    skinHPos = 11;
 end;
+
+skinMeta = {
+
+  -- A
+["Aatrox"]       = {"Classic", "Justicar", "Mecha", "Sea Hunter"},
+["Ahri"]         = {"Classic", "Dynasty", "Midnight", "Foxfire", "Popstar", "Challenger", "Academy"},
+["Akali"]        = {"Classic", "Stinger", "Crimson", "All-star", "Nurse", "Blood Moon", "Silverfang", "Headhunter"},
+["Alistar"]      = {"Classic", "Black", "Golden", "Matador", "Longhorn", "Unchained", "Infernal", "Sweeper", "Marauder"},
+["Amumu"]        = {"Classic", "Pharaoh", "Vancouver", "Emumu", "Re-Gifted", "Almost-Prom King", "Little Knight", "Sad Robot", "Surprise Party"},
+["Anivia"]       = {"Classic", "Team Spirit", "Bird of Prey", "Noxus Hunter", "Hextech", "Blackfrost", "Prehistoric"},
+["Annie"]        = {"Classic", "Goth", "Red Riding", "Annie in Wonderland", "Prom Queen", "Frostfire", "Reverse", "FrankenTibbers", "Panda", "Sweetheart"},
+["Ashe"]         = {"Classic", "Freljord", "Sherwood Forest", "Woad", "Queen", "Amethyst", "Heartseeker", "Marauder"},
+["Azir"]         = {"Classic", "Galactic", "Gravelord"},
+  -- B  
+["Bard"]         = {"Classic", "Elderwood", "Chroma Pack: Marigold", "Chroma Pack: Ivy", "Chroma Pack: Sage"},
+["Blitzcrank"]   = {"Classic", "Rusty", "Goalkeeper", "Boom Boom", "Piltover Customs", "Definitely Not", "iBlitzcrank", "Riot", "Chroma Pack: Molten", "Chroma Pack: Cobalt", "Chroma Pack: Gunmetal", "Battle Boss"},
+["Brand"]        = {"Classic", "Apocalyptic", "Vandal", "Cryocore", "Zombie", "Spirit Fire"},
+["Braum"]        = {"Classic", "Dragonslayer", "El Tigre", "Lionheart"},
+  -- C  
+["Caitlyn"]      = {"Classic", "Resistance", "Sheriff", "Safari", "Arctic Warfare", "Officer", "Headhunter", "Chroma Pack: Pink", "Chroma Pack: Green", "Chroma Pack: Blue"},
+["Cassiopeia"]   = {"Classic", "Desperada", "Siren", "Mythic", "Jade Fang", "Chroma Pack: Day", "Chroma Pack: Dusk", "Chroma Pack: Night"},
+["Chogath"]      = {"Classic", "Nightmare", "Gentleman", "Loch Ness", "Jurassic", "Battlecast Prime", "Prehistoric"},
+["Corki"]        = {"Classic", "UFO", "Ice Toboggan", "Red Baron", "Hot Rod", "Urfrider", "Dragonwing", "Fnatic"},
+  -- D
+["Darius"]       = {"Classic", "Lord", "Bioforge", "Woad King", "Dunkmaster", "Chroma Pack: Black Iron", "Chroma Pack: Bronze", "Chroma Pack: Copper", "Academy"},
+["Diana"]        = {"Classic", "Dark Valkyrie", "Lunar Goddess"},
+["DrMundo"]      = {"Classic", "Toxic", "Mr. Mundoverse", "Corporate Mundo", "Mundo Mundo", "Executioner Mundo", "Rageborn Mundo", "TPA Mundo", "Pool Party"},
+["Draven"]       = {"Classic", "Soul Reaver", "Gladiator", "Primetime", "Pool Party"},
+  -- E 
+["Ekko"]         = {"Classic", "Sandstorm", "Academy"},
+["Elise"]        = {"Classic", "Death Blossom", "Victorious", "Blood Moon"},
+["Evelynn"]      = {"Classic", "Shadow", "Masquerade", "Tango", "Safecracker"},
+["Ezreal"]       = {"Classic", "Nottingham", "Striker", "Frosted", "Explorer", "Pulsefire", "TPA", "Debonair", "Ace of Spades"},
+  -- F 
+["FiddleSticks"] = {"Classic", "Spectral", "Union Jack", "Bandito", "Pumpkinhead", "Fiddle Me Timbers", "Surprise Party", "Dark Candy", "Risen"},
+["Fiora"]        = {"Classic", "Royal Guard", "Nightraven", "Headmistress", "PROJECT"},
+["Fizz"]         = {"Classic", "Atlantean", "Tundra", "Fisherman", "Void", "Chroma Pack: Orange", "Chroma Pack: Black", "Chroma Pack: Red", "Cottontail"},
+  -- G  
+["Galio"]        = {"Classic", "Enchanted", "Hextech", "Commando", "Gatekeeper", "Debonair"},
+["Gangplank"]    = {"Classic", "Spooky", "Minuteman", "Sailor", "Toy Soldier", "Special Forces", "Sultan", "Captain"},
+["Garen"]        = {"Classic", "Sanguine", "Desert Trooper", "Commando", "Dreadknight", "Rugged", "Steel Legion", "Chroma Pack: Garnet", "Chroma Pack: Plum", "Chroma Pack: Ivory", "Rogue Admiral"},
+["Gnar"]         = {"Classic", "Dino", "Gentleman"},
+["Gragas"]       = {"Classic", "Scuba", "Hillbilly", "Santa", "Gragas, Esq.", "Vandal", "Oktoberfest", "Superfan", "Fnatic", "Caskbreaker"},
+["Graves"]       = {"Classic", "Hired Gun", "Jailbreak", "Mafia", "Riot", "Pool Party", "Cutthroat"},
+  -- H 
+["Hecarim"]      = {"Classic", "Blood Knight", "Reaper", "Headless", "Arcade", "Elderwood"},
+["Heimerdinger"] = {"Classic", "Alien Invader", "Blast Zone", "Piltover Customs", "Snowmerdinger", "Hazmat"},
+  -- I 
+["Illaoi"]       = {"Classic", "Void Bringer"},
+["Irelia"]       = {"Classic", "Nightblade", "Aviator", "Infiltrator", "Frostblade", "Order of the Lotus"},
+  -- J 
+["Janna"]        = {"Classic", "Tempest", "Hextech", "Frost Queen", "Victorious", "Forecast", "Fnatic"},
+["JarvanIV"]     = {"Classic", "Commando", "Dragonslayer", "Darkforge", "Victorious", "Warring Kingdoms", "Fnatic"},
+["Jax"]          = {"Classic", "The Mighty", "Vandal", "Angler", "PAX", "Jaximus", "Temple", "Nemesis", "SKT T1", "Chroma Pack: Cream", "Chroma Pack: Amber", "Chroma Pack: Brick", "Warden"},
+["Jayce"]        = {"Classic", "Full Metal", "Debonair", "Forsaken"},
+["Jinx"]         = {"Classic", "Mafia", "Firecracker", "Slayer"},
+  -- K 
+["Kalista"]      = {"Classic", "Blood Moon", "Championship"},
+["Karma"]        = {"Classic", "Sun Goddess", "Sakura", "Traditional", "Order of the Lotus", "Warden"},
+["Karthus"]      = {"Classic", "Phantom", "Statue of", "Grim Reaper", "Pentakill", "Fnatic", "Chroma Pack: Burn", "Chroma Pack: Blight", "Chroma Pack: Frostbite"},
+["Kassadin"]     = {"Classic", "Festival", "Deep One", "Pre-Void", "Harbinger", "Cosmic Reaver"},
+["Katarina"]     = {"Classic", "Mercenary", "Red Card", "Bilgewater", "Kitty Cat", "High Command", "Sandstorm", "Slay Belle", "Warring Kingdoms"},
+["Kayle"]        = {"Classic", "Silver", "Viridian", "Unmasked", "Battleborn", "Judgment", "Aether Wing", "Riot"},
+["Kennen"]       = {"Classic", "Deadly", "Swamp Master", "Karate", "Kennen M.D.", "Arctic Ops"},
+["Khazix"]       = {"Classic", "Mecha", "Guardian of the Sands"},
+["Kindred"]      = {"Classic", "Shadowfire"},
+["KogMaw"]       = {"Classic", "Caterpillar", "Sonoran", "Monarch", "Reindeer", "Lion Dance", "Deep Sea", "Jurassic", "Battlecast"},
+  -- L 
+["Leblanc"]      = {"Classic", "Wicked", "Prestigious", "Mistletoe", "Ravenborn"},
+["LeeSin"]       = {"Classic", "Traditional", "Acolyte", "Dragon Fist", "Muay Thai", "Pool Party", "SKT T1", "Chroma Pack: Black", "Chroma Pack: Blue", "Chroma Pack: Yellow", "Knockout"},
+["Leona"]        = {"Classic", "Valkyrie", "Defender", "Iron Solari", "Pool Party", "Chroma Pack: Pink", "Chroma Pack: Azure", "Chroma Pack: Lemon", "PROJECT"},
+["Lissandra"]    = {"Classic", "Bloodstone", "Blade Queen"},
+["Lucian"]       = {"Classic", "Hired Gun", "Striker", "Chroma Pack: Yellow", "Chroma Pack: Red", "Chroma Pack: Blue", "PROJECT"},
+["Lulu"]         = {"Classic", "Bittersweet", "Wicked", "Dragon Trainer", "Winter Wonder", "Pool Party"},
+["Lux"]          = {"Classic", "Sorceress", "Spellthief", "Commando", "Imperial", "Steel Legion", "Star Guardian"},
+  -- M 
+["Malphite"]     = {"Classic", "Shamrock", "Coral Reef", "Marble", "Obsidian", "Glacial", "Mecha", "Ironside"},
+["Malzahar"]     = {"Classic", "Vizier", "Shadow Prince", "Djinn", "Overlord", "Snow Day"},
+["Maokai"]       = {"Classic", "Charred", "Totemic", "Festive", "Haunted", "Goalkeeper"},
+["MasterYi"]     = {"Classic", "Assassin", "Chosen", "Ionia", "Samurai Yi", "Headhunter", "Chroma Pack: Gold", "Chroma Pack: Aqua", "Chroma Pack: Crimson", "PROJECT"},
+["MissFortune"]  = {"Classic", "Cowgirl", "Waterloo", "Secret Agent", "Candy Cane", "Road Warrior", "Mafia", "Arcade", "Captain"},
+["Mordekaiser"]  = {"Classic", "Dragon Knight", "Infernal", "Pentakill", "Lord", "King of Clubs"},
+["Morgana"]      = {"Classic", "Exiled", "Sinful Succulence", "Blade Mistress", "Blackthorn", "Ghost Bride", "Victorious", "Chroma Pack: Toxic", "Chroma Pack: Pale", "Chroma Pack: Ebony"},
+  -- N 
+["Nami"]         = {"Classic", "Koi", "River Spirit", "Urf", "Chroma Pack: Sunbeam", "Chroma Pack: Smoke", "Chroma Pack: Twilight"},
+["Nasus"]        = {"Classic", "Galactic", "Pharaoh", "Dreadknight", "Riot K-9", "Infernal", "Archduke", "Chroma Pack: Burn", "Chroma Pack: Blight", "Chroma Pack: Frostbite",},
+["Nautilus"]     = {"Classic", "Abyssal", "Subterranean", "AstroNautilus", "Warden"},
+["Nidalee"]      = {"Classic", "Snow Bunny", "Leopard", "French Maid", "Pharaoh", "Bewitching", "Headhunter", "Warring Kingdoms"},
+["Nocturne"]     = {"Classic", "Frozen Terror", "Void", "Ravager", "Haunting", "Eternum"},
+["Nunu"]         = {"Classic", "Sasquatch", "Workshop", "Grungy", "Nunu Bot", "Demolisher", "TPA", "Zombie"},
+  -- O 
+["Olaf"]         = {"Classic", "Forsaken", "Glacial", "Brolaf", "Pentakill", "Marauder"},
+["Orianna"]      = {"Classic", "Gothic", "Sewn Chaos", "Bladecraft", "TPA", "Winter Wonder"},
+  -- P 
+["Pantheon"]     = {"Classic", "Myrmidon", "Ruthless", "Perseus", "Full Metal", "Glaive Warrior", "Dragonslayer", "Slayer"},
+["Poppy"]        = {"Classic", "Noxus", "Lollipoppy", "Blacksmith", "Ragdoll", "Battle Regalia", "Scarlet Hammer"},
+  -- Q 
+["Quinn"]        = {"Classic", "Phoenix", "Woad Scout", "Corsair"},
+  -- R 
+["Rammus"]       = {"Classic", "King", "Chrome", "Molten", "Freljord", "Ninja", "Full Metal", "Guardian of the Sands"},
+["Reksai"]       = {"Classic", "Eternum", "Pool Party"},
+["Renekton"]     = {"Classic", "Galactic", "Outback", "Bloodfury", "Rune Wars", "Scorched Earth", "Pool Party", "Scorched Earth", "Prehistoric"},
+["Rengar"]       = {"Classic", "Headhunter", "Night Hunter", "SSW"},
+["Riven"]        = {"Classic", "Redeemed", "Crimson Elite", "Battle Bunny", "Championship", "Dragonblade", "Arcade"},
+["Rumble"]       = {"Classic", "Rumble in the Jungle", "Bilgerat", "Super Galaxy"},
+["Ryze"]         = {"Classic", "Human", "Tribal", "Uncle", "Triumphant", "Professor", "Zombie", "Dark Crystal", "Pirate", "Whitebeard"},
+  -- S 
+["Sejuani"]      = {"Classic", "Sabretusk", "Darkrider", "Traditional", "Bear Cavalry", "Poro Rider"},
+["Shaco"]        = {"Classic", "Mad Hatter", "Royal", "Nutcracko", "Workshop", "Asylum", "Masked", "Wild Card"},
+["Shen"]         = {"Classic", "Frozen", "Yellow Jacket", "Surgeon", "Blood Moon", "Warlord", "TPA"},
+["Shyvana"]      = {"Classic", "Ironscale", "Boneclaw", "Darkflame", "Ice Drake", "Championship"},
+["Singed"]       = {"Classic", "Riot Squad", "Hextech", "Surfer", "Mad Scientist", "Augmented", "Snow Day", "SSW"},
+["Sion"]         = {"Classic", "Hextech", "Barbarian", "Lumberjack", "Warmonger"},
+["Sivir"]        = {"Classic", "Warrior Princess", "Spectacular", "Huntress", "Bandit", "PAX", "Snowstorm", "Warden", "Victorious"},
+["Skarner"]      = {"Classic", "Sandscourge", "Earthrune", "Battlecast Alpha", "Guardian of the Sands"},
+["Sona"]         = {"Classic", "Muse", "Pentakill", "Silent Night", "Guqin", "Arcade", "DJ"},
+["Soraka"]       = {"Classic", "Dryad", "Divine", "Celestine", "Reaper", "Order of the Banana"},
+["Swain"]        = {"Classic", "Northern Front", "Bilgewater", "Tyrant"},
+["Syndra"]       = {"Classic", "Justicar", "Atlantean", "Queen of Diamonds"},
+  -- T 
+["TahmKench"]    = {"Classic", "Master Chef"},
+["Talon"]        = {"Classic", "Renegade", "Crimson Elite", "Dragonblade", "SSW"},
+["Taric"]        = {"Classic", "Emerald", "Armor of the Fifth Age", "Bloodstone"},
+["Teemo"]        = {"Classic", "Happy Elf", "Recon", "Badger", "Astronaut", "Cottontail", "Super", "Panda", "Omega Squad"},
+["Thresh"]       = {"Classic", "Deep Terror", "Championship", "Blood Moon", "SSW"},
+["Tristana"]     = {"Classic", "Riot Girl", "Earnest Elf", "Firefighter", "Guerilla", "Buccaneer", "Rocket Girl", "Chroma Pack: Navy", "Chroma Pack: Purple", "Chroma Pack: Orange", "Dragon Trainer"},
+["Trundle"]      = {"Classic", "Lil' Slugger", "Junkyard", "Traditional", "Constable"},
+["Tryndamere"]   = {"Classic", "Highland", "King", "Viking", "Demonblade", "Sultan", "Warring Kingdoms", "Nightmare"},
+["TwistedFate"]  = {"Classic", "PAX", "Jack of Hearts", "The Magnificent", "Tango", "High Noon", "Musketeer", "Underworld", "Red Card", "Cutpurse"},
+["Twitch"]       = {"Classic", "Kingpin", "Whistler Village", "Medieval", "Gangster", "Vandal", "Pickpocket", "SSW"},
+  -- U 
+["Udyr"]         = {"Classic", "Black Belt", "Primal", "Spirit Guard", "Definitely Not"},
+["Urgot"]        = {"Classic", "Giant Enemy Crabgot", "Butcher", "Battlecast"},
+  -- V 
+["Varus"]        = {"Classic", "Blight Crystal", "Arclight", "Arctic Ops", "Heartseeker", "Swiftbolt"},
+["Vayne"]        = {"Classic", "Vindicator", "Aristocrat", "Dragonslayer", "Heartseeker", "SKT T1", "Arclight", "Chroma Pack: Green", "Chroma Pack: Red", "Chroma Pack: Silver"},
+["Veigar"]       = {"Classic", "White Mage", "Curling", "Veigar Greybeard", "Leprechaun", "Baron Von", "Superb Villain", "Bad Santa", "Final Boss"},
+["Velkoz"]       = {"Classic", "Battlecast", "Arclight"},
+["Vi"]           = {"Classic", "Neon Strike", "Officer", "Debonair", "Demon"},
+["Viktor"]       = {"Classic", "Full Machine", "Prototype", "Creator"},
+["Vladimir"]     = {"Classic", "Count", "Marquis", "Nosferatu", "Vandal", "Blood Lord", "Soulstealer", "Academy"},
+["Volibear"]     = {"Classic", "Thunder Lord", "Northern Storm", "Runeguard", "Captain"},
+  -- W 
+["Warwick"]      = {"Classic", "Grey", "Urf the Manatee", "Big Bad", "Tundra Hunter", "Feral", "Firefang", "Hyena", "Marauder"},
+["MonkeyKing"]   = {"Classic", "Volcanic", "General", "Jade Dragon", "Underworld"},
+  -- X 
+["Xerath"]       = {"Classic", "Runeborn", "Battlecast", "Scorched Earth", "Guardian of the Sands"},
+["XinZhao"]      = {"Classic", "Commando", "Imperial", "Viscero", "Winged Hussar", "Warring Kingdoms", "Secret Agent"},
+  -- Y 
+["Yasuo"]        = {"Classic", "High Noon", "PROJECT"},
+["Yorick"]       = {"Classic", "Undertaker", "Pentakill"},
+  -- Z 
+["Zac"]          = {"Classic", "Special Weapon", "Pool Party", "Chroma Pack: Orange", "Chroma Pack: Bubblegum", "Chroma Pack: Honey"},
+["Zed"]          = {"Classic", "Shockblade", "SKT T1", "PROJECT"},
+["Ziggs"]        = {"Classic", "Mad Scientist", "Major", "Pool Party", "Snow Day", "Master Arcanist"},
+["Zilean"]       = {"Classic", "Old Saint", "Groovy", "Shurima Desert", "Time Machine", "Blood Moon"},
+["Zyra"]         = {"Classic", "Wildfire", "Haunted", "SKT T1"},
+
+}
