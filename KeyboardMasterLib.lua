@@ -1,5 +1,7 @@
-
-local version = 2.08
+---//==================================================\\---
+--|| > Auto Update                              ||--
+---\\==================================================//---
+local version = 5.23
   local author = "Ensuluyn"
   local SCRIPT_NAME = "KeyboardMasterLib"
   local AUTOUPDATE = true
@@ -28,7 +30,9 @@ local version = 2.08
       Say("Error downloading version info")
     end
   end
-  
+  ---//==================================================\\---
+--|| > LevelSpell Packet                             ||--
+---\\==================================================//---
   _G.LevelSpell = function(id)
     local offsets = { 
     [_Q] = 0x61,
@@ -47,15 +51,10 @@ local version = 2.08
   for i = 1, 4 do p:Encode1(0x00) end
   SendPacket(p)
 end
-function SkinChanger()
-local skinsPB = {}
-local skinObjectPos = nil
-local skinHeader = nil
-local dispellHeader = nil
-local skinH = nil
-local skinHPos = nil
-end
-  function SendSkinPacket(mObject, skinPB, networkID)
+---//==================================================\\---
+--|| > Skin Hack Packets -Divine                         ||--
+---\\==================================================//---
+ function SendSkinPacket(mObject, skinPB, networkID)
   if (string.find(GetGameVersion(), 'Releases/5.22') ~= nil) then
     local mP = CLoLPacket(0x10E);
 
@@ -168,7 +167,229 @@ elseif (string.find(GetGameVersion(), 'Releases/5.23') ~= nil) then
     skinH = 0x74;
     skinHPos = 11;
 end;
+---//==================================================\\---
+--|| > Basic Needs For My Scripts                              ||--
+---\\==================================================//---
+function CountEnemyHeroInRange(range)
+    local enemyInRange = 0
+    for i = 1, heroManager.iCount, 1 do
+        local hero = heroManager:getHero(i)
+        if ValidTarget(hero,range) then
+            enemyInRange = enemyInRange + 1
+        end
+    end
+    return enemyInRange
+end 
+  function UnitHaveBuff(unit, buffName)
+    if unit and buffName and unit.buffCount then
+      for i = 1, unit.buffCount do
+        local buff = unit:getBuff(i)
+        if buff and buff.valid and buff.startT <= GetGameTimer() and buff.endT >= GetGameTimer() and buff.name ~= nil and (buff.name:lower():find(buffName:lower()) or buffName:lower():find(buff.name:lower()) or buffName:lower() == buff.name:lower()) then 
+          return true
+        end
+      end
+    end
+    return false
+  end
 
+function CountObjectsNearPos(pos, range, radius, objects)
+      local n = 0
+      for i, object in ipairs(objects) do
+          if GetDistanceSqr(pos, object) <= radius * radius then
+              n = n + 1
+          end
+      end
+      return n
+  end
+  function GetBestCircularFarmPosition(range, radius, objects)
+      local BestPos 
+      local BestHit = 0
+      for i, object in ipairs(objects) do
+          local hit = CountObjectsNearPos(object.pos or object, range, radius, objects)
+          if hit > BestHit then
+              BestHit = hit
+              BestPos = Vector(object)
+              if BestHit == #objects then
+                 break
+              end
+           end
+      end
+      return BestPos, BestHit
+  end
+   function GetBestLineFarmPosition(range, width, objects)
+      local BestPos 
+      local BestHit = 0
+      for i, object in ipairs(objects) do
+          local EndPos = Vector(myHero.pos) + range * (Vector(object) - Vector(myHero.pos)):normalized()
+          local hit = CountObjectsOnLineSegment(myHero.pos, EndPos, width, objects)
+          if hit > BestHit then
+              BestHit = hit
+              BestPos = Vector(object)
+              if BestHit == #objects then
+                 break
+              end
+           end
+      end
+  
+      return BestPos, BestHit
+  end
+  
+  function CountObjectsOnLineSegment(StartPos, EndPos, width, objects)
+      local n = 0
+      for i, object in ipairs(objects) do
+          local pointSegment, pointLine, isOnSegment = VectorPointProjectionOnLineSegment(StartPos, EndPos, object)
+          if isOnSegment and GetDistanceSqr(pointSegment, object) < width * width then
+              n = n + 1
+          end
+      end
+  
+      return n
+  end
+    function CircleIntersection(v1, v2, c, radius)
+    assert(VectorType(v1) and VectorType(v2) and VectorType(c) and type(radius) == "number", "CircleIntersection: wrong argument types (<Vector>, <Vector>, <Vector>, integer expected)")
+    
+    local x1, y1, x2, y2, x3, y3 = v1.x, v1.z or v1.y, v2.x, v2.z or v2.y, c.x, c.z or c.y
+    local r = radius
+    local xp, yp, xm, ym = nil, nil, nil, nil
+    local IsOnSegment = nil
+    
+    if x1 == x2 then
+    
+      local B = math.sqrt(r^2-(x1-x3)^2)
+      
+      xp, yp, xm, ym = x1, y3+B, x1, y3-B
+    else
+    
+      local m = (y2-y1)/(x2-x1)
+      local n = y1-m*x1
+      local A = x3-m*(n-y3)
+      local B = math.sqrt(A^2-(1+m^2)*(x3^2-r^2+(n-y3)^2))
+      
+      xp, xm = (A+B)/(1+m^2), (A-B)/(1+m^2)
+      yp, ym = m*xp+n, m*xm+n
+    end
+    
+    if x1 <= x2 then
+      IsOnSegment = x1 <= xp and xp <= x2
+    else
+      IsOnSegment = x2 <= xp and xp <= x1        
+    end
+      if IsOnSegment then
+      return Vector(xp, 0, yp)
+    else
+      return Vector(xm, 0, ym)
+    end
+    
+  end
+  function itemfix()
+  
+    ItemNames       = {
+      [3303]        = "ArchAngelsDummySpell",
+      [3007]        = "ArchAngelsDummySpell",
+      [3144]        = "BilgewaterCutlass",
+      [3188]        = "ItemBlackfireTorch",
+      [3153]        = "ItemSwordOfFeastAndFamine",
+      [3405]        = "TrinketSweeperLvl1",
+      [3411]        = "TrinketOrbLvl1",
+      [3166]        = "TrinketTotemLvl1",
+      [3450]        = "OdinTrinketRevive",
+      [2041]        = "ItemCrystalFlask",
+      [2054]        = "ItemKingPoroSnack",
+      [2138]        = "ElixirOfIron",
+      [2137]        = "ElixirOfRuin",
+      [2139]        = "ElixirOfSorcery",
+      [2140]        = "ElixirOfWrath",
+      [3184]        = "OdinEntropicClaymore",
+      [2050]        = "ItemMiniWard",
+      [3401]        = "HealthBomb",
+      [3363]        = "TrinketOrbLvl3",
+      [3092]        = "ItemGlacialSpikeCast",
+      [3460]        = "AscWarp",
+      [3361]        = "TrinketTotemLvl3",
+      [3362]        = "TrinketTotemLvl4",
+      [3159]        = "HextechSweeper",
+      [2051]        = "ItemHorn",
+      --[2003]      = "RegenerationPotion",
+      [3146]        = "HextechGunblade",
+      [3187]        = "HextechSweeper",
+      [3190]        = "IronStylus",
+      [2004]        = "FlaskOfCrystalWater",
+      [3139]        = "ItemMercurial",
+      [3222]        = "ItemMorellosBane",
+      [3042]        = "Muramana",
+      [3043]        = "Muramana",
+      [3180]        = "OdynsVeil",
+      [3056]        = "ItemFaithShaker",
+      [2047]        = "OracleExtractSight",
+      [3364]        = "TrinketSweeperLvl3",
+      [2052]        = "ItemPoroSnack",
+      [3140]        = "QuicksilverSash",
+      [3143]        = "RanduinsOmen",
+      [3074]        = "ItemTiamatCleave",
+      [3800]        = "ItemRighteousGlory",
+      [2045]        = "ItemGhostWard",
+      [3342]        = "TrinketOrbLvl1",
+      [3040]        = "ItemSeraphsEmbrace",
+      [3048]        = "ItemSeraphsEmbrace",
+      [2049]        = "ItemGhostWard",
+      [3345]        = "OdinTrinketRevive",
+      [2044]        = "SightWard",
+      [3341]        = "TrinketSweeperLvl1",
+      [3069]        = "shurelyascrest",
+      [3599]        = "KalistaPSpellCast",
+      [3185]        = "HextechSweeper",
+      [3077]        = "ItemTiamatCleave",
+      [2009]        = "ItemMiniRegenPotion",
+      [2010]        = "ItemMiniRegenPotion",
+      [3023]        = "ItemWraithCollar",
+      [3290]        = "ItemWraithCollar",
+      [2043]        = "VisionWard",
+      [3340]        = "TrinketTotemLvl1",
+      [3090]        = "ZhonyasHourglass",
+      [3154]        = "wrigglelantern",
+      [3142]        = "YoumusBlade",
+      [3157]        = "ZhonyasHourglass",
+      [3512]        = "ItemVoidGate",
+      [3131]        = "ItemSoTD",
+      [3137]        = "ItemDervishBlade",
+      [3352]        = "RelicSpotter",
+      [3350]        = "TrinketTotemLvl2",
+    }
+    
+    _G.ITEM_1       = 06
+    _G.ITEM_2       = 07
+    _G.ITEM_3       = 08
+    _G.ITEM_4       = 09
+    _G.ITEM_5       = 10
+    _G.ITEM_6       = 11
+    _G.ITEM_7       = 12
+    
+    ___GetInventorySlotItem = rawget(_G, "GetInventorySlotItem")
+    _G.GetInventorySlotItem = GetSlotItem
+    
+    
+  end
+---//==================================================\\---
+--|| >  iskeydownfix                           ||--
+---\\==================================================//---
+  local originalKD = _G.IsKeyDown;
+  _G.IsKeyDown = function(theKey)
+    if (type(theKey) ~= 'number') then
+      local theNumber = tonumber(theKey);
+      if (theNumber ~= nil) then
+        return originalKD(theNumber);
+      else
+        return originalKD(GetKey(theKey));
+      end;
+    else
+      return originalKD(theKey);
+    end;
+  end;
+
+
+---//==================================================\\---
+--|| > Skin Hack Table --Credits to Divine                 ||--
+---\\==================================================//---
 skinMeta = {
 
   -- A
