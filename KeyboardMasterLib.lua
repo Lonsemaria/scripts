@@ -8,7 +8,7 @@ local version = 2.08
   local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
   local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
   function Say(text)
-    print("<font color=\"#FF0000\"><b>Keyboard Master Lib:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
+    print("<font color=\"#00FFFF\"><b>Keyboard Master Lib:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
   end
   
   if AUTOUPDATE then
