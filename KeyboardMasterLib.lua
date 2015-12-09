@@ -25,6 +25,7 @@ local version = 5.24
           DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () Say("Successfully updated., press F9 twice to load the updated version.") end) end, 3)
         else
           Say("-Welcome, You have got the latest version ")
+          DelayAction(function() print("<font color=\"#00FFFF\"><b>Keyboard Master Lib:- </b></font><font color=\"#FFFFFF\"> Do not use Skin hack until the next update") end, 14)
         end
       end
     else 
