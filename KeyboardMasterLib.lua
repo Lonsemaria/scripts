@@ -2,7 +2,7 @@
 --|| > Auto Update                              ||--
 ---\\==================================================//---
 
-local version = 5.24
+local version = 5.241
   local author = "Ensuluyn"
   local SCRIPT_NAME = "KeyboardMasterLib"
   local AUTOUPDATE = true
@@ -32,9 +32,12 @@ local version = 5.24
       Say("Error downloading version info")
     end
   end
+  _GAME_VERSION = string.find(GetGameVersion(), 'Releases/5.23') 
+_GAME_LEVEL = string.find(GetGameVersion(), 'Releases/5.24') 
   ---//==================================================\\---
 --|| > LevelSpell Packet                             ||--
 ---\\==================================================//---
+  if (_GAME_LEVEL ~= nil) then
   _G.LevelSpell = function(id)
      local offsets = { 
     [_Q] = 0x1E,
@@ -53,45 +56,13 @@ local version = 5.24
   for i = 1, 4 do p:Encode1(0x00) end
   SendPacket(p)
 end
+end
+
 ---//==================================================\\---
 --|| > Skin Hack Packets -Divine                         ||--
 ---\\==================================================//---
  function SendSkinPacket(mObject, skinPB, networkID)
-  if (string.find(GetGameVersion(), 'Releases/5.22') ~= nil) then
-    local mP = CLoLPacket(0x10E);
-
-    mP.vTable = 0xFD17D0;
-
-    mP:EncodeF(networkID);
-    
-    mP:Encode1(0x00);
-    
-    if (skinPB == nil) then
-      mP:Encode4(0xE4E4E4E4);
-    else
-      mP:Encode1(skinPB);
-      for I = 1, 3 do
-        mP:Encode1(skinH);
-      end;
-    end;
-
-    for I = 1, string.len(mObject) do
-      mP:Encode1(string.byte(string.sub(mObject, I, I)));
-    end;
-
-    for I = 1, (16 - string.len(mObject)) do
-      mP:Encode1(0x00);
-    end;
-
-    mP:Encode4(0x0000000E);
-    mP:Encode4(0x0000000F);
-    mP:Encode4(0x00000000);
-    mP:Encode4(0x00000000);
-    mP:Encode2(0x0000);
-    
-    mP:Hide();
-    RecvPacket(mP);
-  elseif (string.find(GetGameVersion(), 'Releases/5.23') ~= nil) then
+if (_GAME_VERSION ~= nil) then
       local mP = CLoLPacket(0x13);
       mP.vTable = 0xF4FDE0;
  
@@ -128,27 +99,7 @@ end
       RecvPacket(mP);
   end;
 end;
-if (string.find(GetGameVersion(), 'Releases/5.22') ~= nil) then
-  skinsPB = {
-    [1] = 0xCA,
-    [10] = 0x20,
-    [8] = 0x3C,
-    [4] = 0x75,
-    [12] = 0x7B,
-    [5] = 0xB4,
-    [9] = 0xC8,
-    [7] = 0xCE,
-    [3] = 0xD4,
-    [11] = 0xD7,
-    [6] = 0xDD,
-    [2] = 0xF9,
-  };
-  skinObjectPos = 11;
-  skinHeader = 0x10E;
-  dispellHeader = 0x83;
-  skinH = 0xCA;
-  skinHPos = 7;
-elseif (string.find(GetGameVersion(), 'Releases/5.23') ~= nil) then
+if (_GAME_VERSION ~= nil) then
     skinsPB = {
       [1] = 0x74,
       [10] = 0x04,
