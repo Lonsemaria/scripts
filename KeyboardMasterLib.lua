@@ -2,7 +2,7 @@
 --|| > Auto Update                              ||--
 ---\\==================================================//---
 
-local version = 5.242
+local version = 5.243
   local author = "Ensuluyn"
   local SCRIPT_NAME = "KeyboardMasterLib"
   local AUTOUPDATE = true
@@ -63,40 +63,38 @@ end
 ---\\==================================================//---
  function SendSkinPacket(mObject, skinPB, networkID)
 if (_GAME_VERSION ~= nil) then
-      local mP = CLoLPacket(0x13);
-      mP.vTable = 0xF4FDE0;
- 
-      mP:EncodeF(myHero.networkID);
-      mP:Encode4(0x00000000);
+    local mP = CLoLPacket(0x3A);
+
+    mP.vTable = 0xF351B0;
+    mP:EncodeF(myHero.networkID);
+
+    for I = 1, string.len(mObject) do
+      mP:Encode1(string.byte(string.sub(mObject, I, I)));
+    end;
+
+    for I = 1, (16 - string.len(mObject)) do
       mP:Encode1(0x00);
-   
-      if (skinPB == nil) then
-        mP:Encode4(0x2F2F2F2F);
-      else
+    end;
 
-        mP:Encode1(skinPB);
-        for I = 1, 3 do
-          mP:Encode1(0x74);
-        end;
-
+    mP:Encode4(0x0000000E);
+    mP:Encode4(0x0000000F);
+    mP:Encode2(0x0000);
+    
+    if (skinPB == nil) then
+      mP:Encode4(0x82828282);
+    else
+      mP:Encode1(skinPB);
+      for I = 1, 3 do
+        mP:Encode1(skinH);
       end;
-      mP:Encode1(0x75);
+    end;
 
-      for I = 1, string.len(mObject) do
-        mP:Encode1(string.byte(string.sub(mObject, I, I)));
-      end;
-
-      for I = 1, (16 - string.len(mObject)) do
-        mP:Encode1(0x00);
-      end;
-
-      mP:Encode4(0x00000000);
-      mP:Encode4(0x0000000F);
-      mP:Encode4(0x00000000);
-      mP:Encode1(0x00);
-      
-      mP:Hide();
-      RecvPacket(mP);
+    mP:Encode4(0x00000000);
+    mP:Encode4(0x00000000);
+    mP:Encode1(0x00);
+    
+    mP:Hide();
+    RecvPacket(mP);
   end;
 end;
 if (_GAME_VERSION ~= nil) then
