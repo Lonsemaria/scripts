@@ -2,7 +2,7 @@
 --|| > Auto Update                              ||--
 ---\\==================================================//---
 
-local version = 5.241
+local version = 5.242
   local author = "Ensuluyn"
   local SCRIPT_NAME = "KeyboardMasterLib"
   local AUTOUPDATE = true
@@ -25,14 +25,14 @@ local version = 5.241
           DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () Say("Successfully updated., press F9 twice to load the updated version.") end) end, 3)
         else
           Say("-Welcome, You have got the latest version ")
-          DelayAction(function() print("<font color=\"#00FFFF\"><b>Keyboard Master Lib:- </b></font><font color=\"#FFFFFF\"> Do not use Skin hack until the next update") end, 14)
+          --DelayAction(function() print("<font color=\"#00FFFF\"><b>Keyboard Master Lib:- </b></font><font color=\"#FFFFFF\"> Do not use Skin hack until the next update") end, 14)
         end
       end
     else 
       Say("Error downloading version info")
     end
   end
-  _GAME_VERSION = string.find(GetGameVersion(), 'Releases/5.23') 
+  _GAME_VERSION = string.find(GetGameVersion(), 'Releases/5.24') 
 _GAME_LEVEL = string.find(GetGameVersion(), 'Releases/5.24') 
   ---//==================================================\\---
 --|| > LevelSpell Packet                             ||--
@@ -100,25 +100,25 @@ if (_GAME_VERSION ~= nil) then
   end;
 end;
 if (_GAME_VERSION ~= nil) then
-    skinsPB = {
-      [1] = 0x74,
-      [10] = 0x04,
-      [8] = 0x14,
-      [4] = 0x34,
-      [12] = 0x44,
-      [5] = 0x54,
-      [9] = 0x84,
-      [7] = 0x94,
-      [3] = 0xB4,
-      [11] = 0xC4,
-      [6] = 0xD4,
-      [2] = 0xF4,
-    };
-    skinObjectPos = 16;
-    skinHeader = 0x13;
-    dispellHeader = 0x13B;
-    skinH = 0x74;
-    skinHPos = 11;
+skinsPB = {
+    [1] = 0xCA,
+    [10] = 0x68,
+    [8] = 0xE8,
+    [4] = 0xF8,
+    [12] = 0xD8,
+    [5] = 0xB8,
+    [9] = 0xA8,
+    [7] = 0x38,
+    [3] = 0x0C,
+    [11] = 0x28,
+    [6] = 0x78,
+    [2] = 0x4C,
+  };
+  skinObjectPos = 6;
+  skinHeader = 0x3A;
+  dispellHeader = 0xB7;
+  skinH = 0x8C;
+  skinHPos = 32;
 end;
 ---//==================================================\\---
 --|| > Basic Needs For My Scripts                              ||--
