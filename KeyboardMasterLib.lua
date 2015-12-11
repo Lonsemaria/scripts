@@ -2,7 +2,7 @@
 --|| > Auto Update                              ||--
 ---\\==================================================//---
 
-local version = 5.243
+local version = 5.244
   local author = "Ensuluyn"
   local SCRIPT_NAME = "KeyboardMasterLib"
   local AUTOUPDATE = true
