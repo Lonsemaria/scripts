@@ -2,13 +2,13 @@
 --|| > Auto Update                              ||--
 ---\\==================================================//---
 
-local version = 5.244
+local version = 5.245
   local author = "Ensuluyn"
   local SCRIPT_NAME = "KeyboardMasterLib"
   local AUTOUPDATE = true
   local UPDATE_HOST = "raw.github.com"
   local UPDATE_PATH = "/Lonsemaria/scripts/master/KeyboardMasterLib.lua".."?rand="..math.random(1,10000)
-  local UPDATE_FILE_PATH = SCRIPT_PATH..GetCurrentEnv().FILE_NAME
+  local UPDATE_FILE_PATH = LIB_PATH..GetCurrentEnv().FILE_NAME
   local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
   function Say(text)
     print("<font color=\"#00FFFF\"><b>Keyboard Master Lib:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
