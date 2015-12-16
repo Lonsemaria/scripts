@@ -22,16 +22,16 @@ if _AUTO_UPDATE or true then
           "http://"..serveradress..scriptadress.."KeyboardMasterLib.lua",
           LIB_PATH.."\\KeyboardMasterLib.lua",
           function ()
-           Say("Successfully updated., press F9 twice to load the updated version.")
+          DelayAction(function() Say("Successfully updated., press F9 twice to load the updated version.")end, 3)
           end
         })
       end
     else
-    Say("-Welcome, You have got the latest version ")
+    Say("An error occured, while updating, please reload")
     end
   end
   end
-DelayAction(function() print("<font color='#00FFFF'>[Keyboard Master Lib:] </font><font color='#FFFFFF'>-</font><font color='#FFFFFF'> -Welcome, You have got the latest version</font>")end, 5.5)
+DelayAction(function() print("<font color='#00FFFF'>[Keyboard Master Lib:] </font><font color='#FFFFFF'>-</font><font color='#FFFFFF'> Loaded..</font>")end, 0.2)
   _GAME_VERSION = string.find(GetGameVersion(), 'Releases/5.24') 
 _GAME_LEVEL = string.find(GetGameVersion(), 'Releases/5.24') 
   ---//==================================================\\---
