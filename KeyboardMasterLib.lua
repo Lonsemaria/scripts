@@ -31,6 +31,7 @@ if _AUTO_UPDATE or true then
     end
   end
   end
+DelayAction(function() print("<font color='#00FFFF'>[Keyboard Master Lib:] </font><font color='#FFFFFF'>-</font><font color='#FFFFFF'> -Welcome, You have got the latest version</font>")end, 5.5)
   _GAME_VERSION = string.find(GetGameVersion(), 'Releases/5.24') 
 _GAME_LEVEL = string.find(GetGameVersion(), 'Releases/5.24') 
   ---//==================================================\\---
