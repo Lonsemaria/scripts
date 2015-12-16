@@ -1,36 +1,35 @@
+_AUTO_UPDATE = true
+
 ---//==================================================\\---
 --|| > Auto Update                              ||--
 ---\\==================================================//---
-
-local version = 5.245
-  local author = "Ensuluyn"
-  local SCRIPT_NAME = "KeyboardMasterLib"
-  local AUTOUPDATE = true
-  local UPDATE_HOST = "raw.github.com"
-  local UPDATE_PATH = "/Lonsemaria/scripts/master/KeyboardMasterLib.lua".."?rand="..math.random(1,10000)
-  local UPDATE_FILE_PATH = LIB_PATH..GetCurrentEnv().FILE_NAME
-  local UPDATE_URL = "https://"..UPDATE_HOST..UPDATE_PATH
+local serveradress = "raw.github.com"
+local scriptadress = "/Lonsemaria/scripts/master/"
+local LocalVersion = "5.246"
   function Say(text)
     print("<font color=\"#00FFFF\"><b>Keyboard Master Lib:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
   end
   
-  if AUTOUPDATE then
-    local ServerData = GetWebResult(UPDATE_HOST, "/Lonsemaria/scripts/master/version/Packet.version")
-    if ServerData then
-      ServerVersion = type(tonumber(ServerData)) == "number" and tonumber(ServerData) or nil
-      if ServerVersion then
-        if tonumber(version) < ServerVersion then
-          Say("New version available "..ServerVersion)
+if _AUTO_UPDATE or true then
+  local ServerVersionDATA = GetWebResult(serveradress , scriptadress.."version/Packet.version")
+  if ServerVersionDATA then
+    local ServerVersion = tonumber(ServerVersionDATA)
+    if ServerVersion then
+      if ServerVersion > tonumber(LocalVersion) then
+       Say("New version available "..ServerVersion)
           Say("Updating, please don't press F9")
-          DelayAction(function() DownloadFile(UPDATE_URL, UPDATE_FILE_PATH, function () Say("Successfully updated., press F9 twice to load the updated version.") end) end, 3)
-        else
-          Say("-Welcome, You have got the latest version ")
-          --DelayAction(function() print("<font color=\"#00FFFF\"><b>Keyboard Master Lib:- </b></font><font color=\"#FFFFFF\"> Do not use Skin hack until the next update") end, 14)
-        end
+        DelayAction(DownloadFile, 0, {
+          "http://"..serveradress..scriptadress.."KeyboardMasterLib.lua",
+          LIB_PATH.."\\KeyboardMasterLib.lua",
+          function ()
+           Say("Successfully updated., press F9 twice to load the updated version.")
+          end
+        })
       end
-    else 
-      Say("Error downloading version info")
+    else
+    Say("-Welcome, You have got the latest version ")
     end
+  end
   end
   _GAME_VERSION = string.find(GetGameVersion(), 'Releases/5.24') 
 _GAME_LEVEL = string.find(GetGameVersion(), 'Releases/5.24') 
