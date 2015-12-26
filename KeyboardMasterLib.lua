@@ -142,60 +142,69 @@ end
     end
     return false
   end
-
+function _GetDistanceSqr(p1, p2)
+    p2 = p2 or player
+    if p1 and p1.networkID and (p1.networkID ~= 0) and p1.visionPos then p1 = p1.visionPos end
+    if p2 and p2.networkID and (p2.networkID ~= 0) and p2.visionPos then p2 = p2.visionPos end
+    return GetDistanceSqr(p1, p2)
+    
+end
 function CountObjectsNearPos(pos, range, radius, objects)
-      local n = 0
-      for i, object in ipairs(objects) do
-          if GetDistanceSqr(pos, object) <= radius * radius then
-              n = n + 1
-          end
-      end
-      return n
-  end
-  function GetBestCircularFarmPosition(range, radius, objects)
-      local BestPos 
-      local BestHit = 0
-      for i, object in ipairs(objects) do
-          local hit = CountObjectsNearPos(object.pos or object, range, radius, objects)
-          if hit > BestHit then
-              BestHit = hit
-              BestPos = Vector(object)
-              if BestHit == #objects then
-                 break
-              end
-           end
-      end
-      return BestPos, BestHit
-  end
-   function GetBestLineFarmPosition(range, width, objects)
-      local BestPos 
-      local BestHit = 0
-      for i, object in ipairs(objects) do
-          local EndPos = Vector(myHero.pos) + range * (Vector(object) - Vector(myHero.pos)):normalized()
-          local hit = CountObjectsOnLineSegment(myHero.pos, EndPos, width, objects)
-          if hit > BestHit then
-              BestHit = hit
-              BestPos = Vector(object)
-              if BestHit == #objects then
-                 break
-              end
-           end
-      end
-  
-      return BestPos, BestHit
-  end
-  
-  function CountObjectsOnLineSegment(StartPos, EndPos, width, objects)
-      local n = 0
-      for i, object in ipairs(objects) do
-          local pointSegment, pointLine, isOnSegment = VectorPointProjectionOnLineSegment(StartPos, EndPos, object)
-          if isOnSegment and GetDistanceSqr(pointSegment, object) < width * width then
-              n = n + 1
-          end
-      end
-  
-      return n
-  end
+    local n = 0
+    for i, object in ipairs(objects) do
+        local r = radius --+ object.boundingRadius
+        if _GetDistanceSqr(pos, object) <= math.pow(r, 2) then
+            n = n + 1
+        end
+    end
+
+    return n
+end
+
+function GetBestCircularFarmPosition(range, radius, objects)
+    local BestPos 
+    local BestHit = 0
+    for i, object in ipairs(objects) do
+        local hit = CountObjectsNearPos(object.visionPos or object, range, radius, objects)
+        if hit > BestHit then
+            BestHit = hit
+            BestPos = object--Vector(object)
+            if BestHit == #objects then
+               break
+            end
+         end
+    end
+    return BestPos, BestHit
+end
+ function CountObjectsOnLineSegment(StartPos, EndPos, width, objects)
+    local n = 0
+    for i, object in ipairs(objects) do
+        local pointSegment, pointLine, isOnSegment = VectorPointProjectionOnLineSegment(StartPos, EndPos, object)
+        local w = width --+ object.boundingRadius
+        if isOnSegment and GetDistanceSqr(pointSegment, object) < math.pow(w, 2) and GetDistanceSqr(StartPos, EndPos) > GetDistanceSqr(StartPos, object) then
+            n = n + 1
+        end
+    end
+    return n
+end
+    
+
+function GetBestLineFarmPosition(range, width, objects)
+    local BestPos 
+    local BestHit = 0
+    for i, object in ipairs(objects) do
+        local EndPos = Vector(myHero) + range * (Vector(object) - Vector(myHero)):normalized()
+        local hit = CountObjectsOnLineSegment(myHero, EndPos, width, objects)
+        if hit > BestHit then
+            BestHit = hit
+            BestPos = object--Vector(object)
+            if BestHit == #objects then
+               break
+            end
+         end
+    end
+    return BestPos, BestHit
+end
    function CurrentTimeInMillis()
   return (os.clock() * 1000);
 end
@@ -279,7 +288,7 @@ end
       [2052]        = "ItemPoroSnack",
       [3140]        = "QuicksilverSash",
       [3143]        = "RanduinsOmen",
-      [3074]        = "ItemTiamatCleave",
+      --[3074]        = "ItemTiamatCleave",
       [3800]        = "ItemRighteousGlory",
       [2045]        = "ItemGhostWard",
       [3342]        = "TrinketOrbLvl1",
@@ -308,6 +317,9 @@ end
       [3137]        = "ItemDervishBlade",
       [3352]        = "RelicSpotter",
       [3350]        = "TrinketTotemLvl2",
+      [3053]        = "TitanicHydra",
+      [3074]        = "RavenousHydra",
+      
     }
     
     _G.ITEM_1       = 06
@@ -323,7 +335,45 @@ end
     
     
   end
-  
+  isAGapcloserUnit = {
+  ['Ahri']        = {true, spell = _R,          range = 450,   projSpeed = 2200, },
+  ['Aatrox']      = {true, spell = _Q,                  range = 1000,  projSpeed = 1200, },
+  ['Akali']       = {true, spell = _R,                  range = 800,   projSpeed = 2200, },
+  ['Alistar']     = {true, spell = _W,                  range = 650,   projSpeed = 2000, },
+  ['Amumu']       = {true, spell = _Q,                  range = 1100,  projSpeed = 1800, },
+  ['Corki']       = {true, spell = _W,                  range = 800,   projSpeed = 650,  },
+  ['Diana']       = {true, spell = _R,                  range = 825,   projSpeed = 2000, },
+  ['Darius']      = {true, spell = _R,                  range = 460,   projSpeed = math.huge, },
+  ['Fiora']       = {true, spell = _Q,                  range = 600,   projSpeed = 2000, },
+  ['Fizz']        = {true, spell = _Q,                  range = 550,   projSpeed = 2000, },
+  ['Gragas']      = {true, spell = _E,                  range = 600,   projSpeed = 2000, },
+  ['Graves']      = {true, spell = _E,                  range = 425,   projSpeed = 2000, exeption = true },
+  ['Hecarim']     = {true, spell = _R,                  range = 1000,  projSpeed = 1200, },
+  ['Irelia']      = {true, spell = _Q,                  range = 650,   projSpeed = 2200, },
+  ['JarvanIV']    = {true, spell = _Q,                  range = 770,   projSpeed = 2000, },
+  ['Jax']         = {true, spell = _Q,                  range = 700,   projSpeed = 2000, },
+  ['Jayce']       = {true, spell = 'JayceToTheSkies',   range = 600,   projSpeed = 2000, },
+  ['Khazix']      = {true, spell = _E,                  range = 900,   projSpeed = 2000, },
+  ['Leblanc']     = {true, spell = _W,                  range = 600,   projSpeed = 2000, },
+  --['LeeSin']      = {true, spell = 'blindmonkqtwo',     range = 1300,  projSpeed = 1800, },
+  ['Leona']       = {true, spell = _E,                  range = 900,   projSpeed = 2000, },
+  ['Lucian']      = {true, spell = _E,                  range = 425,   projSpeed = 2000, },
+  ['Malphite']    = {true, spell = _R,                  range = 1000,  projSpeed = 1500, },
+  ['Maokai']      = {true, spell = _W,                  range = 525,   projSpeed = 2000, },
+  ['MonkeyKing']  = {true, spell = _E,                  range = 650,   projSpeed = 2200, },
+  ['Pantheon']    = {true, spell = _W,                  range = 600,   projSpeed = 2000, },
+  ['Poppy']       = {true, spell = _E,                  range = 525,   projSpeed = 2000, },
+  ['Riven']       = {true, spell = _E,                  range = 150,   projSpeed = 2000, },
+  ['Renekton']    = {true, spell = _E,                  range = 450,   projSpeed = 2000, },
+  ['Sejuani']     = {true, spell = _Q,                  range = 650,   projSpeed = 2000, },
+  ['Shen']        = {true, spell = _E,                  range = 575,   projSpeed = 2000, },
+  ['Shyvana']     = {true, spell = _R,                  range = 1000,  projSpeed = 2000, },
+  ['Tristana']    = {true, spell = _W,                  range = 900,   projSpeed = 2000, },
+  ['Tryndamere']  = {true, spell = 'Slash',             range = 650,   projSpeed = 1450, },
+  ['XinZhao']     = {true, spell = _E,                  range = 650,   projSpeed = 2000, },
+  ['Yasuo']       = {true, spell = _E,                  range = 475,   projSpeed = 1000, },
+  ['Vayne']       = {true, spell = _Q,                  range = 300,   projSpeed = 1000, },
+}
   Interrupt = {
     ["Katarina"] = {charName = "Katarina", stop = {["KatarinaR"] = {name = "Death lotus(R)", spellName = "KatarinaR", ult = true }}},
     ["Nunu"] = {charName = "Nunu", stop = {["AbsoluteZero"] = {name = "Absolute Zero(R)", spellName = "AbsoluteZero", ult = true }}},
