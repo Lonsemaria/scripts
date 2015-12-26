@@ -5,7 +5,7 @@ _AUTO_UPDATE = true
 ---\\==================================================//---
 local serveradress = "raw.github.com"
 local scriptadress = "/Lonsemaria/scripts/master/"
-local LocalVersion = "5.246"
+local LocalVersion = "5.247"
   function Say(text)
     print("<font color=\"#00FFFF\"><b>Keyboard Master Lib:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
   end
