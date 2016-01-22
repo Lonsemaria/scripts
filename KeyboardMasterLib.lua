@@ -5,7 +5,7 @@ currentpatch = "6.1"
 ---\\==================================================//---
 local serveradress = "raw.github.com"
 local scriptadress = "/Lonsemaria/scripts/master/"
-local LocalVersion = "6.1"
+local LocalVersion = "6.11"
   function Say(text)
     print("<font color=\"#00FFFF\"><b>Keyboard Master Lib:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
   end
@@ -32,7 +32,7 @@ if _AUTO_UPDATE or true then
   end
   end
 DelayAction(function() print("<font color='#00FFFF'>[Keyboard Master Lib] </font><font color='#FFFFFF'>-</font><font color='#FFFFFF'> Loaded..</font>")end, 0.2)
-  _GAME_VERSION = string.find(GetGameVersion(), 'Releases/5.24') 
+  _GAME_VERSION = string.find(GetGameVersion(), 'Releases/6.1') 
 _GAME_LEVEL = string.find(GetGameVersion(), 'Releases/6.1') 
   ---//==================================================\\---
 --|| > LevelSpell Packet                             ||--
@@ -63,60 +63,60 @@ end
 ---\\==================================================//---
  function SendSkinPacket(mObject, skinPB, networkID)
 if (_GAME_VERSION ~= nil) then
-    local mP = CLoLPacket(0x3A);
-
-    mP.vTable = 0xF351B0;
+   local mP = CLoLPacket(header);
+      
+    mP.vTable = 0xEECD38;
     mP:EncodeF(myHero.networkID);
-
-    for I = 1, string.len(mObject) do
-      mP:Encode1(string.byte(string.sub(mObject, I, I)));
-    end;
-
-    for I = 1, (16 - string.len(mObject)) do
-      mP:Encode1(0x00);
-    end;
-
-    mP:Encode4(0x0000000E);
-    mP:Encode4(0x0000000F);
-    mP:Encode2(0x0000);
     
     if (skinPB == nil) then
-      mP:Encode4(0x82828282);
+      mP:Encode4(0xA4A4A4A4);
     else
       mP:Encode1(skinPB);
       for I = 1, 3 do
         mP:Encode1(skinH);
       end;
     end;
-
-    mP:Encode4(0x00000000);
-    mP:Encode4(0x00000000);
-    mP:Encode1(0x00);
     
-    mP:Hide();
-    RecvPacket(mP);
-  end;
+        mP:Encode4(0x00000000);
+        mP:Encode2(0x0000);
+        mP:Encode1(0x00);
+      for I = 1, string.len(mObject) do
+        mP:Encode1(string.byte(string.sub(mObject, I, I)));
+      end;
+
+      for I = 1, (14 - string.len(mObject)) do
+        mP:Encode1(0x00);
+      end;
+      mP:Encode1(0x00);
+      mP:Encode1(0x00);
+      mP:Encode4(0x0000000D);
+      mP:Encode4(0x0000000F);
+      mP:Encode4(0x00000000);
+      mP:Hide();
+      RecvPacket(mP);
+    end;
 end;
 if (_GAME_VERSION ~= nil) then
 skinsPB = {
-    [1] = 0xCA,
-    [10] = 0x68,
-    [8] = 0xE8,
-    [4] = 0xF8,
-    [12] = 0xD8,
-    [5] = 0xB8,
-    [9] = 0xA8,
-    [7] = 0x38,
-    [3] = 0x0C,
-    [11] = 0x28,
-    [6] = 0x78,
-    [2] = 0x4C,
-  };
-  skinObjectPos = 6;
-  skinHeader = 0x3A;
-  dispellHeader = 0xB7;
-  skinH = 0x8C;
-  skinHPos = 32;
+      [1] = 0x74,
+      [10] = 0x3F,
+      [8] = 0x37,
+      [4] = 0xB2,
+      [12] = 0xB0,
+      [5] = 0x2B,
+      [9] = 0x2F,
+      [7] = 0x27,
+      [3] = 0xA2,
+      [11] = 0xA0,
+      [6] = 0x3B,
+      [2] = 0xBC,
+    };
+    skinObjectPos = 16;
+    skinHeader = 0x9C;
+    dispellHeader = 0x39;
+    skinH = 0xAC;
+    skinHPos = 6;
+    header = 0x9C
 end;
 ---//==================================================\\---
 --|| > Basic Needs For My Scripts                              ||--
