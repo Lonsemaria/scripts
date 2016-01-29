@@ -1,11 +1,11 @@
 _AUTO_UPDATE = true
-currentpatch = "6.1"
+currentpatch = "6.2"
 ---//==================================================\\---
 --|| > Auto Update                              ||--
 ---\\==================================================//---
 local serveradress = "raw.github.com"
 local scriptadress = "/Lonsemaria/scripts/master/"
-local LocalVersion = "6.11"
+local LocalVersion = "6.2"
   function Say(text)
     print("<font color=\"#00FFFF\"><b>Keyboard Master Lib:</b></font> <font color=\"#FFFFFF\">" .. text .. "</font>")
   end
@@ -33,29 +33,28 @@ if _AUTO_UPDATE or true then
   end
 DelayAction(function() print("<font color='#00FFFF'>[Keyboard Master Lib] </font><font color='#FFFFFF'>-</font><font color='#FFFFFF'> Loaded..</font>")end, 0.2)
   _GAME_VERSION = string.find(GetGameVersion(), 'Releases/6.1') 
-_GAME_LEVEL = string.find(GetGameVersion(), 'Releases/6.1') 
+_GAME_LEVEL = string.find(GetGameVersion(), 'Releases/6.2') 
   ---//==================================================\\---
 --|| > LevelSpell Packet                             ||--
 ---\\==================================================//---
   if (_GAME_LEVEL ~= nil) then
     _G.LevelSpell = function(id)
-   local offsets = { 
-    [_Q] = 0x71,
-    [_W] = 0xF1,
-    [_E] = 0x31,
-    [_R] = 0xB1,
+  local offsets = { 
+  [_Q] = 0x41,
+  [_W] = 0xFC,
+  [_E] = 0x64,
+  [_R] = 0xAA,
   }
-  local p = CLoLPacket(0x00DB)
-  p.vTable = 0xF6D830
+  local p = CLoLPacket(0x0153)
+  p.vTable = 0xFE9264
   p:EncodeF(myHero.networkID)
-  for i = 1, 4 do p:Encode1(0x30) end
-  p:Encode1(0x17)
-  for i = 1, 4 do p:Encode1(0x81) end
-  for i = 1, 4 do p:Encode1(0x6A) end
   p:Encode1(offsets[id])
-  for i = 1, 4 do p:Encode1(0x00) end
+  for i = 1, 4 do p:Encode1(0xF7) end
+  for i = 1, 4 do p:Encode1(0xAF) end
+  p:Encode1(0x8F)
+  for i = 1, 4 do p:Encode1(0xA5) end
   SendPacket(p)
-end
+  end
 end
 
 ---//==================================================\\---
